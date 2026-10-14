@@ -22,7 +22,8 @@ export async function requestNotifications(): Promise<NotificationPermission | '
 /** Shows a system notification if allowed; through the service worker where the constructor is not (Android). */
 export async function systemNotify(title: string, body: string): Promise<void> {
   if (!notificationsSupported() || Notification.permission !== 'granted') return;
-  const options: NotificationOptions = { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', tag: title };
+  const icon = `${import.meta.env.BASE_URL}icons/icon-192.png`;
+  const options: NotificationOptions = { body, icon, badge: icon, tag: title };
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
     if (registration) {

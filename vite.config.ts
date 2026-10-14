@@ -2,7 +2,9 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+// GitHub Pages serves the app from /SmartOperation/; `vite build --mode pages` builds for it.
+export default defineConfig(({ mode }) => ({
+  base: mode === 'pages' ? '/SmartOperation/' : '/',
   plugins: [
     react(),
     VitePWA({
@@ -11,14 +13,15 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        id: '/',
+        // Relative to the manifest, so the same build works at / and at /SmartOperation/.
+        id: './',
         name: 'Трекер',
         short_name: 'Трекер',
         description: 'Оценки, финансы, расписание, заметки и котировки. Данные хранятся на устройстве.',
         lang: 'ru',
         dir: 'ltr',
-        start_url: '/',
-        scope: '/',
+        start_url: './',
+        scope: './',
         display: 'standalone',
         orientation: 'any',
         theme_color: '#101110',
@@ -72,4 +75,4 @@ export default defineConfig({
     // Stable dates in tests that touch "today".
     env: { TZ: 'Europe/Minsk' },
   },
-});
+}));
