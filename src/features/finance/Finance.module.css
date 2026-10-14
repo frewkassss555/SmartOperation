@@ -197,3 +197,91 @@
 .income {
   color: var(--accent);
 }
+
+/* Limits and goal */
+
+.budget {
+  display: flex;
+  flex-direction: column;
+  padding-top: 1px;
+}
+
+.budgetBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: -1px;
+  padding: 16px;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.budgetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -8px -8px -4px 0;
+}
+
+.budgetTitle {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.limits {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.limit,
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.limitRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.limitName {
+  font-size: var(--fs-body);
+}
+
+.limitNums {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+/* 80% of the limit and above: the whole block turns red. */
+.limitWarn .limitName,
+.limitWarn .limitNums,
+.limitNote {
+  color: var(--negative);
+}
+
+.limitNote {
+  /* Not uppercased: the currency symbol (Br) must keep its case. */
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.goalDone {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.limitFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}

@@ -112,6 +112,10 @@ export type Settings = {
   demo: boolean;
   /** navigator.storage.persist() was already requested. */
   persistAsked: boolean;
+  /** Monthly expense limit per category, minor units. */
+  limits: Record<string, number>;
+  /** Savings goal, measured by the balance. */
+  goal: { title: string; target: number } | null;
 };
 
 export const DEFAULT_CATEGORIES = ['Еда', 'Транспорт', 'Учёба', 'Досуг', 'Подписки', 'Другое'];
@@ -125,6 +129,8 @@ export const DEFAULT_SETTINGS: Settings = {
   categories: DEFAULT_CATEGORIES,
   demo: false,
   persistAsked: false,
+  limits: {},
+  goal: null,
 };
 
 export const DEFAULT_WATCH: Watch[] = [

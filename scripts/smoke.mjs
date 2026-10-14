@@ -70,6 +70,13 @@ try {
   await expectVisible(page.getByText('−6,40 Br'), 'expense row');
   await expectVisible(page.getByText('Проезд'), 'expense title');
 
+  step = 'finance: monthly limit turns red at 80%';
+  await page.getByRole('button', { name: 'Настроить' }).click();
+  await dialog.getByLabel('Транспорт, Br').fill('8');
+  await dialog.getByRole('button', { name: 'Сохранить' }).click();
+  await expectVisible(page.getByText('6,40\u00a0Br / 8,00\u00a0Br'), 'limit numbers');
+  await expectVisible(page.getByText('80% лимита'), 'limit warning');
+
   step = 'notes: create with autosave';
   await page.goto(`${base}#/notes`);
   await page.getByRole('button', { name: 'Новая заметка +' }).click();

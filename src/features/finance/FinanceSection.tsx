@@ -9,6 +9,7 @@ import { balance, expensesByDay, formatMoney, formatMoneyShort, totals } from '.
 import type { SectionProps } from '../types';
 import { rangeDates, useTxns } from './data';
 import styles from './Finance.module.css';
+import { BudgetBlock } from './BudgetBlock';
 import { TxnDialog } from './TxnDialog';
 
 const RANGES = [
@@ -106,6 +107,9 @@ export function FinanceSection({ compact, wide }: SectionProps) {
           })}
         </div>
       </div>
+
+      {/* The overview panel stays short; limits and the goal live in the full section. */}
+      {(compact || wide) && <BudgetBlock txns={all} />}
     </>
   );
 

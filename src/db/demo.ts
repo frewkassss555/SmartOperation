@@ -163,7 +163,12 @@ export async function addDemoData(today = new Date()): Promise<void> {
     await db.notes.bulkAdd(notes);
     await db.tasks.bulkAdd(tasks);
     await db.focus.bulkAdd(focus);
-    await updateSettings({ demo: true });
+    await updateSettings({
+      demo: true,
+      // Keep the user's own limits and goal if they already set them.
+      limits: Object.keys(settings.limits ?? {}).length ? settings.limits : { Еда: 6000, Транспорт: 1500, Досуг: 4000 },
+      goal: settings.goal ?? { title: 'Наушники', target: 25000 },
+    });
   });
   await applyRecurring(today);
   await requestPersistenceOnce();
