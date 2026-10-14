@@ -1,0 +1,48 @@
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.md {
+  font-size: var(--fs-number);
+}
+
+.lg {
+  font-size: var(--fs-number-lg);
+}
+
+.average {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-average);
+  line-height: 0.9;
+}
+
+.text {
+  color: var(--text);
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.negative {
+  color: var(--negative);
+}
+
+.hint {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}

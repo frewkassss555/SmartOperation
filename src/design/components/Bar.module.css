@@ -1,0 +1,22 @@
+.bar {
+  display: flex;
+  gap: 3px;
+}
+
+.block {
+  flex: 1 1 0;
+  height: 6px;
+  background: var(--line);
+}
+
+.text {
+  background: var(--text);
+}
+
+.accent {
+  background: var(--accent);
+}
+
+.negative {
+  background: var(--negative);
+}

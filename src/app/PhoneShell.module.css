@@ -1,0 +1,135 @@
+.shell {
+  display: grid;
+  grid-template-rows: var(--header-h) minmax(0, 1fr) calc(var(--nav-h) + env(safe-area-inset-bottom));
+  height: 100vh;
+  height: 100dvh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 var(--gutter);
+  border-bottom: var(--rule-strong) solid var(--text);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.settings {
+  display: inline-flex;
+  align-items: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  margin-right: -8px;
+  padding: 0 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.settings:hover,
+.settings[aria-current='page'] {
+  color: var(--text);
+}
+
+.main {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px var(--gutter) 32px;
+}
+
+.screenHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.title {
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-screen-title);
+  line-height: 0.9;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.counter {
+  flex-shrink: 0;
+  padding-bottom: 2px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: var(--rule-strong) solid var(--text);
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  height: var(--nav-h);
+  color: var(--muted);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.navItem + .navItem {
+  border-left: var(--rule) solid var(--line);
+}
+
+.navItem:hover {
+  color: var(--text);
+  background: var(--panel);
+}
+
+.navItem:focus-visible {
+  outline-offset: -4px;
+}
+
+.navIndex {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: var(--tracking-label);
+}
+
+.navLabel {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.active,
+.active:hover {
+  background: var(--text);
+  color: var(--ground);
+}

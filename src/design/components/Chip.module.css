@@ -1,0 +1,46 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border: var(--rule) solid var(--line-strong);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}
+
+/* Toggle chips keep a 44px hit area around the small visual. */
+.toggle {
+  position: relative;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  inset: -11px -4px;
+}
+
+.toggle:hover {
+  color: var(--text);
+}
+
+.pressed {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--ground);
+}
+
+.pressed:hover {
+  color: var(--ground);
+}

@@ -1,0 +1,34 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Two-part block: big average on the left, two stacked cells on the right. */
+.summary {
+  display: flex;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.average {
+  flex: 1 1 50%;
+  justify-content: space-between;
+  padding: 16px;
+  border-right: var(--rule) solid var(--line-strong);
+}
+
+.cells {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cell {
+  flex: 1 1 0;
+  padding: 16px;
+}
+
+.cell + .cell {
+  border-top: var(--rule) solid var(--line-strong);
+}

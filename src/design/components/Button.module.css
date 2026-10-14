@@ -1,0 +1,73 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: var(--rule) solid transparent;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.md {
+  min-height: var(--tap);
+  font-size: 14px;
+}
+
+.lg {
+  min-height: 56px;
+  font-size: 18px;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--ground);
+}
+
+.primary:hover {
+  background: var(--text);
+}
+
+.secondary {
+  background: transparent;
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.secondary:hover {
+  background: var(--panel);
+  border-color: var(--text);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--muted);
+}
+
+.ghost:hover {
+  color: var(--text);
+}
+
+/* Disabled keeps its shape so stub screens show the final layout. */
+.button:disabled {
+  cursor: not-allowed;
+}
+
+.primary:disabled:hover {
+  background: var(--accent);
+}
+
+.secondary:disabled:hover {
+  background: transparent;
+  border-color: var(--line-strong);
+}

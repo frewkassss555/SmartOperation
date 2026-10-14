@@ -1,0 +1,48 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  padding: 24px;
+  background: var(--ground);
+}
+
+.framed {
+  border: var(--rule) solid var(--line-strong);
+}
+
+.panel:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline-offset: -2px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-panel-title);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.index {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.aside {
+  flex-shrink: 0;
+}

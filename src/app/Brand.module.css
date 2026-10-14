@@ -1,0 +1,18 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: var(--tracking-brand);
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.square {
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  flex-shrink: 0;
+}

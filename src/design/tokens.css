@@ -1,0 +1,55 @@
+/* Design tokens. The whole UI reads colors, type and motion from here only. */
+:root {
+  /* Color */
+  --ground: #101110;       /* background */
+  --panel: #171917;        /* selected row, hover */
+  --line: #2B2E2A;         /* dividers */
+  --line-strong: #3A3D38;  /* block borders */
+  --text: #ECE8DC;
+  --text-soft: #B9B6AC;    /* note body text */
+  --muted: #8C8F86;        /* captions and uppercase labels */
+  --accent: #D7FF3D;       /* the only accent; text on it uses --ground */
+  --negative: #FF6A45;
+  --radius: 0;
+
+  /* Lines */
+  --rule: 1px;
+  --rule-strong: 2px;
+
+  /* Type families */
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Type scale */
+  --fs-screen-title: 46px;
+  --fs-panel-title: 34px;
+  --fs-label: 11px;
+  --fs-body: 15px;
+  --fs-body-sm: 14px;
+  --fs-number: 32px;
+  --fs-number-lg: 48px;
+  --fs-average: 96px;
+  --tracking-label: 0.1em;
+  --tracking-brand: 0.18em;
+
+  /* Layout */
+  --breakpoint-desktop: 900px; /* reference only: CSS media queries cannot read variables */
+  --gutter: 20px;
+  --header-h: 56px;
+  --nav-h: 64px;
+  --sidebar-w: 240px;
+  --desktop-header-h: 72px;
+  --tap: 44px;
+
+  /* Motion */
+  --dur: 120ms;
+  --ease: linear;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --fs-screen-title: 104px;
+    --gutter: 32px;
+  }
+}
