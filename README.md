@@ -1,70 +1,94 @@
 # Tracker
 
-An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device in IndexedDB. The only network request is for crypto quotes (CoinGecko). The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
+An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. Everything is stored on the device in IndexedDB: there is no backend and no sign-up. The only network request is for crypto quotes (CoinGecko). The interface is in Russian, with a strict angular look: square corners, thick rules, one lime accent and large numbers.
 
-**Status:** stage 4 of 5. All five sections, the overview and settings work offline, plus the stage 4 extras: grade target calculator, deadlines, focus timer with an activity grid, category limits and a savings goal, price alerts, a notional portfolio, Ctrl+K quick entry and a Sunday weekly summary. On the desktop each section opens full screen; the overview shows them all as panels.
+The full spec (in Russian) is in [PROMPT.md](PROMPT.md). Every non-obvious decision is logged in [DECISIONS.md](DECISIONS.md).
 
-## Requirements
+## Quick start
 
-Node.js 22.6 or newer (the check scripts import TypeScript directly).
-
-## Scripts
+Node.js 22.6 or newer.
 
 ```sh
 npm install
-npm run dev          # dev server at http://127.0.0.1:5173 (opens the browser)
-npm run typecheck    # TypeScript, strict
-npm test             # Vitest: calculations, API parsing, export/import, migrations
-npm run build        # type check + production build into dist/ (with the service worker)
-npm run preview      # serve dist/; install and offline mode only work here, not in dev
-npm run screenshots  # after build: 390×844 and 1440×900 screenshots into screenshots/
-npm run smoke        # after build: Playwright walk-through, including offline mode
-npm run icons        # re-render the PWA icons into public/icons
+npm run dev          # http://127.0.0.1:5173, opens the browser
 ```
-
-`screenshots`, `smoke` and `icons` need Playwright's Chromium once: `npx playwright install chromium`.
 
 On Windows PowerShell with script execution disabled, use `npm.cmd` instead of `npm`.
 
-### Demo quotes
+To see the app with data: **Настройки → Добавить демо-данные**.
 
-`VITE_DEMO_MARKET=1 npm run dev` replaces CoinGecko with deterministic series from `src/lib/demoMarket.ts`. This is useful offline or when the public API rate-limits you. In PowerShell: `$env:VITE_DEMO_MARKET='1'; npm.cmd run dev`.
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server (no service worker) |
+| `npm run typecheck` | TypeScript in strict mode |
+| `npm test` | Vitest: all calculations, API parsing, export/import round-trip, schema migrations, colour contrast |
+| `npm run build` | Type check and production build into `dist/`, with the service worker |
+| `npm run preview` | Serve `dist/` at http://127.0.0.1:4173; install and offline mode work only here |
+| `npm run smoke` | After `build`: a Playwright walk-through of every feature, including offline mode |
+| `npm run screenshots` | After `build`: 390×844 and 1440×900 screenshots (dark, light, empty, demo) into `screenshots/`; fails on horizontal overflow at 320px or console errors |
+| `npm run icons` | Re-render the PWA icons into `public/icons` |
+
+`smoke`, `screenshots` and `icons` need Playwright's Chromium once: `npx playwright install chromium`.
+
+`VITE_DEMO_MARKET=1 npm run dev` replaces CoinGecko with deterministic series from `src/lib/demoMarket.ts`. Use it offline or when the public API rate-limits you. In PowerShell: `$env:VITE_DEMO_MARKET='1'; npm.cmd run dev`.
+
+## Features
+
+- **Overview:** the home screen on both layouts. The desktop shows every section as a panel; on the phone it opens by tapping ТРЕКЕР. On Sundays it starts with a weekly summary.
+- **Grades:** subjects (create, rename, archive), grades on a 1–5, 1–10 or 1–12 scale with weights 1–3, weighted averages, one-tap quick add, a weekly trend chart and a target calculator ("две десятки").
+- **Finance:** expenses and income in minor units, balance, daily expense bars by week or month, filters, recurring transactions, monthly category limits (red at 80%) and a savings goal.
+- **Plan:** a six-day timetable with the current lesson and a countdown, odd/even weeks and copy day; deadlines with a day countdown; a 25/5 focus timer with a 12-week activity grid.
+- **Notes:** search, tags, pinning, subject link, autosave after 400 ms.
+- **Market:** CoinGecko quotes refreshed every minute, a 1D/7D/30D polyline chart, a watch list of up to 10 coins, price alerts and a notional portfolio. The last saved prices stay visible offline.
+- **Settings:** grade scale, currency (BYN by default), start balance, week parity, categories, theme (dark, light, system), JSON export and import (replace or merge), demo data, and delete everything (confirmed by typing УДАЛИТЬ).
+- **Everywhere:** deleting has no dialogs; a square "ОТМЕНИТЬ" bar appears for 5 seconds instead.
+- **Desktop only:** each section opens full screen in two columns. `Ctrl+K` opens quick entry (`оценка информатика 9`, `расход 6.4 транспорт`, `заметка идея для проекта`). Keys `1`–`5` open sections and `0` opens the overview.
 
 ## Structure
 
 ```
 src/
-  app/        shell, navigation, hash router, UI state (Zustand), undo and update bars
-  design/     tokens.css, base.css, fonts, components (Panel, Stat, Chip, Segmented, Button,
-              Field, Bar, EmptyState, Dialog, LineChart, Delta, Columns)
+  app/        shell (phone / desktop), hash router, UI state (Zustand), theme, undo and update bars
+  design/     tokens.css, base.css, fonts, components: Panel, Stat, Chip, Segmented, Button, Field,
+              Bar, EmptyState, Dialog, LineChart, Delta, Columns
   db/         Dexie schema and migrations, settings, export/import, demo data, recurring transactions
-  features/   grades, finance, schedule, notes, market, overview, settings,
-              tasks (deadlines), focus, command (Ctrl+K)
+  features/   grades, finance, schedule, notes, market, overview, settings, tasks, focus, command
   lib/        pure logic with tests: dates, money, grades, grade calculator, recurring, schedule,
-              notes, market, CoinGecko client, tasks, focus, budget, alerts, portfolio, quick-entry
-              parser, weekly summary
+              notes, market, CoinGecko client, tasks, focus, budget, alerts, portfolio,
+              quick-entry parser, weekly summary
   pwa/        service worker registration, install prompt, notifications
 public/       favicon and PWA icons
-scripts/      screenshot, smoke and icon scripts
+scripts/      smoke test, screenshots, icons, CoinGecko mock for Playwright
 ```
 
 ## Data
 
-- Money is stored as integer minor units (kopecks); dates as `YYYY-MM-DD` strings.
-- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`, currently 3) and migrations are tested.
+- Money is stored as integer minor units (kopecks). Dates are `YYYY-MM-DD` strings. IDs come from `crypto.randomUUID()`.
+- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`, currently 3), and the v1 → v3 migration is tested.
 - Export is one JSON file with all user tables and a `version` field. Import validates it and offers replace or merge. Quote caches are not exported.
+- `navigator.storage.persist()` is requested when the first user data is saved.
 
-## Offline and quotes
+## Offline, quotes and install
 
-- The service worker (Workbox via vite-plugin-pwa) precaches the whole shell: JS, CSS, fonts and icons.
-- CoinGecko requests are network-first with a 4-second timeout and fall back to the cache. Responses are also stored in IndexedDB. The UI shows the last saved prices with the time ("ОБНОВЛЕНО 14:20").
-- Quotes refresh every 60 seconds while the tab is visible. After a 429 the app waits 2, 4, 8 and at most 15 minutes before trying again.
+- Workbox (via vite-plugin-pwa) precaches the whole shell: JS, CSS, fonts and icons. A new version shows a "ДОСТУПНО ОБНОВЛЕНИЕ" bar and reloads only on request.
+- CoinGecko requests are network-first with a 4-second timeout and fall back to the cache. Quotes are also kept in IndexedDB with their timestamp ("ОБНОВЛЕНО 14:20").
+- Quotes refresh every 60 seconds while the tab is visible, with at most one request per coin and period per minute. CoinGecko sends its 429 without CORS headers, so any failure while online backs off: 2, 4 and 8 minutes, up to 15.
+- Install comes from the browser prompt (the "Установить" button in settings). On iOS, settings show a "Поделиться → На экран „Домой“" hint.
 
-## Keyboard (desktop)
+## Quality checks
 
-- `Ctrl+K` / `Cmd+K`: quick entry, e.g. `оценка информатика 9`, `расход 6.4 транспорт`, `заметка идея для проекта`.
-- `1`–`5`: open a section; `0`: the overview.
+- Type check, 113 unit tests and the build pass. The smoke test covers every feature, offline mode, the skip link and the focus ring.
+- No border radius except 0, no shadows, gradients, blur, emoji or icon fonts. Colours come only from tokens, and there is no purple (also enforced by a test).
+- Text contrast is at least 4.5:1 in both themes, tested against `tokens.css`. Lighthouse Accessibility is 100 on every phone screen. Best Practices is 96–100: it drops only when CoinGecko refuses a request and the browser logs the CORS error. Performance on the overview is 92 on the phone and 100 on the desktop.
+- No horizontal scroll at 320px on any screen.
 
-## Design rules
+## Not done or done differently
 
-The look is defined by tokens in `src/design/tokens.css`. Use tokens only. No border radius, shadows, gradients, blur, emoji or icon fonts. Phone layout below 900px, desktop overview from 900px.
+- **Desktop layout:** at the owner's request, each section opens full screen instead of all living on one overview panel. The overview with every panel is still the home screen.
+- **Plan section:** on the phone it is split into tabs (lessons, deadlines, focus) so the screen does not grow endlessly.
+- **Price alerts:** these work only while the app is open. Push without a server is impossible, and the app has no server; settings say so.
+- **Install and offline mode** were checked automatically (manifest, service worker control, offline reload with Playwright). On a real phone they need hosting over HTTPS, which is not set up.
+- **Manifest:** generated by vite-plugin-pwa at build time rather than kept as `public/manifest.webmanifest`.
+- **Quotes:** the keyless CoinGecko API is rate-limited per IP and shared with everyone on the same network. A Demo key would raise the limit, but keys must not ship in client code.
