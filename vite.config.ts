@@ -15,8 +15,8 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         // Relative to the manifest, so the same build works at / and at /SmartOperation/.
         id: './',
-        name: 'Трекер',
-        short_name: 'Трекер',
+        name: 'SmartOperation',
+        short_name: 'SmartOperation',
         description: 'Оценки, финансы, расписание, заметки и котировки. Данные хранятся на устройстве.',
         lang: 'ru',
         dir: 'ltr',

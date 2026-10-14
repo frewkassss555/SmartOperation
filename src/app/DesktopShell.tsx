@@ -9,6 +9,7 @@ import { WeeklySummaryBlock } from '../features/overview/WeeklySummaryBlock';
 import { formatUsd } from '../lib/market';
 import { formatFullDate, formatHeaderDate, isoWeek, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
+import { Credits } from './Credits';
 import { useToday } from './hooks';
 import { routeHref, SECTIONS, type Route, type Section, type SectionId } from './routes';
 import { SECTION_VIEWS } from './sectionViews';
@@ -51,7 +52,7 @@ export function DesktopShell({ route }: { route: Route }) {
           href={routeHref('overview')}
           className={route === 'overview' ? `${styles.brandRow} ${styles.brandActive}` : styles.brandRow}
           aria-current={route === 'overview' ? 'page' : undefined}
-          aria-label="Трекер, обзор"
+          aria-label="SmartOperation, обзор"
         >
           <Brand />
         </a>
@@ -135,6 +136,7 @@ export function DesktopShell({ route }: { route: Route }) {
           <footer className={styles.footer}>
             <span>{demoNote(overview.demo)}</span>
             <span>Данные хранятся только на этом устройстве</span>
+            <Credits className={styles.footerCredits} />
           </footer>
         </main>
       </div>

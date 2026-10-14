@@ -213,7 +213,7 @@ try {
   await expectVisible(dp.getByRole('heading', { level: 1, name: 'Финансы' }), 'finance page');
   await dp.getByRole('navigation', { name: 'Разделы' }).getByRole('link', { name: /План/ }).click();
   await expectVisible(dp.getByRole('heading', { level: 1, name: 'Расписание' }), 'schedule page');
-  await dp.getByRole('link', { name: 'Трекер, обзор' }).click();
+  await dp.getByRole('link', { name: 'SmartOperation, обзор' }).click();
   await expectVisible(dp.getByRole('link', { name: 'Открыть раздел Оценки на весь экран' }), 'back to overview');
 
   step = 'desktop: Ctrl+K quick entry and number keys';

@@ -149,3 +149,16 @@
   background: var(--text);
   color: var(--ground);
 }
+
+.credits {
+  margin-top: 40px;
+  padding-top: 12px;
+  border-top: var(--rule) solid var(--line);
+}
+
+/* Below 360px the header keeps the name and settings; the date is in the overview title. */
+@media (max-width: 359px) {
+  .date {
+    display: none;
+  }
+}

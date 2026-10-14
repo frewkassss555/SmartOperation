@@ -25,6 +25,6 @@ export async function evaluateAlerts(): Promise<void> {
   });
   for (const text of fired) {
     notify(text);
-    await systemNotify('Трекер · цена', text);
+    await systemNotify('SmartOperation · цена', text);
   }
 }

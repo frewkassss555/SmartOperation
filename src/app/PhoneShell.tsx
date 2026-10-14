@@ -3,6 +3,7 @@ import { FocusIndicator } from '../features/focus/FocusIndicator';
 import { useTimer } from '../features/focus/timer';
 import { formatHeaderDate, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
+import { Credits } from './Credits';
 import { useToday } from './hooks';
 import { routeHref, SECTIONS, type Route } from './routes';
 import { SECTION_VIEWS } from './sectionViews';
@@ -29,7 +30,7 @@ export function PhoneShell({ route }: { route: Route }) {
           href={routeHref('overview')}
           className={styles.brandLink}
           aria-current={route === 'overview' ? 'page' : undefined}
-          aria-label="Трекер, обзор"
+          aria-label="SmartOperation, обзор"
         >
           <Brand />
         </a>
@@ -71,6 +72,7 @@ export function PhoneShell({ route }: { route: Route }) {
             <View compact />
           </Suspense>
         </div>
+        <Credits className={styles.credits} />
       </main>
 
       <nav className={styles.nav} aria-label="Разделы">

@@ -275,3 +275,7 @@
   border-color: var(--accent);
   color: var(--ground);
 }
+.footerCredits {
+  flex-basis: 100%;
+  text-transform: none;
+}

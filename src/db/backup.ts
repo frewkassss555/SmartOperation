@@ -36,7 +36,7 @@ export function parseBackup(text: string): { ok: true; backup: Backup } | { ok: 
     return { ok: false, error: 'Файл не похож на JSON.' };
   }
   if (!isObject(data) || data.app !== 'tracker' || !isObject(data.tables)) {
-    return { ok: false, error: 'Это не экспорт Трекера.' };
+    return { ok: false, error: 'Это не экспорт SmartOperation.' };
   }
   if (typeof data.version !== 'number' || !Number.isInteger(data.version) || data.version < 1) {
     return { ok: false, error: 'В файле нет номера версии.' };

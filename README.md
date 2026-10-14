@@ -1,4 +1,6 @@
-# Tracker
+# SmartOperation
+
+By Felix Boyarsky · GitHub [frewkassss555](https://github.com/frewkassss555) · TikTok [frewkassss.dev](https://www.tiktok.com/@frewkassss.dev)
 
 An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. Everything is stored on the device in IndexedDB: there is no backend and no sign-up. The only network request is for crypto quotes (CoinGecko). The interface is in Russian, with a strict angular look: square corners, thick rules, one lime accent and large numbers.
 

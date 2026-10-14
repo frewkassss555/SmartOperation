@@ -31,7 +31,7 @@ export function PortfolioBlock({ list, quotes }: Props) {
       </div>
 
       {held.length === 0 ? (
-        <p className={styles.note}>Укажите, сколько монет у вас есть и почём куплены, — Трекер посчитает стоимость и результат.</p>
+        <p className={styles.note}>Укажите, сколько монет у вас есть и почём куплены, — SmartOperation посчитает стоимость и результат.</p>
       ) : (
         <>
           <div className={styles.portfolioTotal}>

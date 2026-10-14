@@ -1,9 +1,9 @@
 // System notifications while the app is open. There is no push server, so nothing
-// arrives when Трекер is closed.
+// arrives when SmartOperation is closed.
 
 /** Shown next to every place that sets up notifications. */
 export const PUSH_NOTE =
-  'Уведомления приходят, только пока Трекер открыт (вкладка или установленное приложение). Push без сервера невозможен, а сервера у Трекера нет — данные не покидают устройство.';
+  'Уведомления приходят, только пока SmartOperation открыт (вкладка или установленное приложение). Push без сервера невозможен, а сервера у SmartOperation нет — данные не покидают устройство.';
 
 export function notificationsSupported(): boolean {
   return 'Notification' in window;

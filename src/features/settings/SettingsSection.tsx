@@ -52,20 +52,20 @@ function InstallBlock() {
         <Button variant="primary" onClick={promptInstall}>
           Установить
         </Button>
-        <p className={styles.note}>Трекер откроется отдельным окном и будет работать без сети.</p>
+        <p className={styles.note}>SmartOperation откроется отдельным окном и будет работать без сети.</p>
       </div>
     );
   }
   if (isIos()) {
     return (
       <p className={styles.note}>
-        Чтобы установить на iPhone или iPad: откройте Трекер в Safari, нажмите «Поделиться», затем «На экран „Домой“».
+        Чтобы установить на iPhone или iPad: откройте SmartOperation в Safari, нажмите «Поделиться», затем «На экран „Домой“».
       </p>
     );
   }
   return (
     <p className={styles.note}>
-      Установить можно из меню браузера (Chrome, Edge, Яндекс Браузер): «Установить приложение». После первой загрузки Трекер
+      Установить можно из меню браузера (Chrome, Edge, Яндекс Браузер): «Установить приложение». После первой загрузки SmartOperation
       работает и без сети.
     </p>
   );

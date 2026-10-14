@@ -5,7 +5,8 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 18px;
-  letter-spacing: var(--tracking-brand);
+  /* The longer name (SmartOperation) needs tighter tracking to fit 320px and the sidebar. */
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   line-height: 1;
 }
@@ -15,4 +16,13 @@
   height: 12px;
   background: var(--accent);
   flex-shrink: 0;
+}
+
+/* Narrow phones: the long name gets a smaller size. */
+@media (max-width: 380px) {
+  .brand {
+    gap: 8px;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+  }
 }
