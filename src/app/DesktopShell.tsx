@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Delta, Panel, Stat } from '../design';
-import { CommandPalette } from '../features/command/CommandPalette';
 import commandStyles from '../features/command/Command.module.css';
 import { useHotkeys } from '../features/command/useHotkeys';
 import { FocusIndicator } from '../features/focus/FocusIndicator';
@@ -14,6 +13,9 @@ import { useToday } from './hooks';
 import { routeHref, SECTIONS, type Route, type Section, type SectionId } from './routes';
 import { SECTION_VIEWS } from './sectionViews';
 import styles from './DesktopShell.module.css';
+
+// Quick entry loads on first use.
+const CommandPalette = lazy(() => import('../features/command/CommandPalette').then((m) => ({ default: m.CommandPalette })));
 
 /** Panel rows of the overview, as in the approved layout. */
 const ROWS: readonly (readonly SectionId[])[] = [
@@ -136,7 +138,11 @@ export function DesktopShell({ route }: { route: Route }) {
           </footer>
         </main>
       </div>
-      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
+      {paletteOpen && (
+        <Suspense fallback={null}>
+          <CommandPalette open onClose={() => setPaletteOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }
@@ -152,7 +158,11 @@ function SectionPage({ section }: { section: Section }) {
         </span>
       </div>
       <div className="appear">
+        <Suspense fallback={null}>
+          <Suspense fallback={null}>
         <View compact={false} wide />
+      </Suspense>
+        </Suspense>
       </div>
     </>
   );
@@ -163,7 +173,9 @@ function SettingsPage() {
   return (
     <>
       <h1 className={styles.title}>Настройки</h1>
-      <View compact={false} wide />
+      <Suspense fallback={null}>
+        <View compact={false} wide />
+      </Suspense>
     </>
   );
 }
@@ -225,7 +237,9 @@ function OverviewPage({ overview }: { overview: ReturnType<typeof useOverview> }
                     </a>
                   }
                 >
-                  <View compact={false} />
+                  <Suspense fallback={null}>
+                    <View compact={false} />
+                  </Suspense>
                 </Panel>
               );
             })}

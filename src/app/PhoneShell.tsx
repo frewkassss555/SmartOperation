@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { FocusIndicator } from '../features/focus/FocusIndicator';
 import { useTimer } from '../features/focus/timer';
 import { formatHeaderDate, overviewTitle, toIsoDate } from '../lib/date';
@@ -67,7 +67,9 @@ export function PhoneShell({ route }: { route: Route }) {
           )}
         </div>
         <div key={route} className="appear">
-          <View compact />
+          <Suspense fallback={null}>
+            <View compact />
+          </Suspense>
         </div>
       </main>
 
