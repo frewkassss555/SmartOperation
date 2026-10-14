@@ -9,3 +9,4 @@ export { EmptyState } from './components/EmptyState';
 export { Dialog } from './components/Dialog';
 export { LineChart } from './components/LineChart';
 export { Delta } from './components/Delta';
+export { Columns } from './components/Columns';

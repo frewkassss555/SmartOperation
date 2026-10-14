@@ -85,3 +85,32 @@
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
+
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Full screen: the new-note button and search sit side by side, cards fill a grid. */
+.topWide {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  align-items: start;
+  gap: 24px;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  padding: 1px 0 0 1px;
+}
+
+.cardsGrid .card {
+  height: 100%;
+  margin: -1px 0 0 -1px;
+}
+
+.cardsGrid .body {
+  -webkit-line-clamp: 6;
+}

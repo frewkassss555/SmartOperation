@@ -13,7 +13,7 @@ const formatStamp = (ms: number) => {
   return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`;
 };
 
-export function NotesSection(_: SectionProps) {
+export function NotesSection({ wide }: SectionProps) {
   const notes = useNotes();
   const subjects = useSubjects();
   const [query, setQuery] = useState('');
@@ -37,27 +37,29 @@ export function NotesSection(_: SectionProps) {
 
   return (
     <div className={styles.section}>
-      <Button variant="primary" size="lg" block onClick={startNew}>
-        Новая заметка +
-      </Button>
+      <div className={wide ? styles.topWide : styles.top}>
+        <Button variant="primary" size="lg" block onClick={startNew}>
+          Новая заметка +
+        </Button>
 
-      {all.length > 0 && (
-        <div className={styles.tools}>
-          <Field label="Поиск" type="search" placeholder="Заголовок или текст" value={query} onChange={(e) => setQuery(e.target.value)} />
-          {tags.length > 0 && (
-            <div className={styles.filters} role="group" aria-label="Фильтр по тегу">
-              <Chip pressed={activeTag === null} onClick={() => setTag(null)}>
-                Все
-              </Chip>
-              {tags.map((t) => (
-                <Chip key={t} pressed={activeTag === t} onClick={() => setTag(activeTag === t ? null : t)}>
-                  {t}
+        {all.length > 0 && (
+          <div className={styles.tools}>
+            <Field label="Поиск" type="search" placeholder="Заголовок или текст" value={query} onChange={(e) => setQuery(e.target.value)} />
+            {tags.length > 0 && (
+              <div className={styles.filters} role="group" aria-label="Фильтр по тегу">
+                <Chip pressed={activeTag === null} onClick={() => setTag(null)}>
+                  Все
                 </Chip>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                {tags.map((t) => (
+                  <Chip key={t} pressed={activeTag === t} onClick={() => setTag(activeTag === t ? null : t)}>
+                    {t}
+                  </Chip>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {notes !== undefined && all.length === 0 && (
         <EmptyState title="Заметок пока нет">
@@ -68,7 +70,7 @@ export function NotesSection(_: SectionProps) {
       {all.length > 0 && visible.length === 0 && <p className={styles.muted}>Ничего не найдено.</p>}
 
       {visible.length > 0 && (
-        <ul className={`${styles.cards} appear`} aria-label="Заметки">
+        <ul className={`${wide ? styles.cardsGrid : styles.cards} appear`} aria-label="Заметки">
           {visible.map((n) => (
             <li key={n.id}>
               <button type="button" className={styles.card} onClick={() => setOpenId(n.id)}>

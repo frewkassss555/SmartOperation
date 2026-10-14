@@ -119,6 +119,21 @@ try {
 
   await context.close();
 
+  step = 'desktop: sections open full screen';
+  const desk = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
+  await mockCoinGecko(desk);
+  const dp = await desk.newPage();
+  dp.on('pageerror', (e) => errors.push(e.message));
+  await dp.goto(base);
+  await expectVisible(dp.getByRole('link', { name: 'Открыть раздел Финансы на весь экран' }), 'overview panels');
+  await dp.getByRole('link', { name: 'Открыть раздел Финансы на весь экран' }).click();
+  await expectVisible(dp.getByRole('heading', { level: 1, name: 'Финансы' }), 'finance page');
+  await dp.getByRole('navigation', { name: 'Разделы' }).getByRole('link', { name: /План/ }).click();
+  await expectVisible(dp.getByRole('heading', { level: 1, name: 'Расписание' }), 'schedule page');
+  await dp.getByRole('link', { name: 'Трекер, обзор' }).click();
+  await expectVisible(dp.getByRole('link', { name: 'Открыть раздел Оценки на весь экран' }), 'back to overview');
+  await desk.close();
+
   step = 'pwa: manifest and offline';
   const offline = await browser.newContext({ viewport: { width: 390, height: 844 } });
   await mockCoinGecko(offline);

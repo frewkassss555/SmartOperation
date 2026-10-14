@@ -220,3 +220,57 @@
   text-transform: uppercase;
   color: var(--muted);
 }
+
+/* Full-screen section */
+
+.pageHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.counter {
+  flex-shrink: 0;
+  padding-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.brandActive {
+  color: var(--accent);
+}
+
+.crumbLink {
+  color: var(--muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.crumbLink:hover {
+  color: var(--text);
+}
+
+/* "Открыть" link in a panel header */
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 0 14px;
+  border: var(--rule) solid var(--line-strong);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.open:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}

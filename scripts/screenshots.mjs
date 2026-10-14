@@ -74,9 +74,9 @@ try {
     await small.context.close();
 
     const desk = await session(1440, 900, demo);
-    await shoot(desk.page, 'overview', `${prefix}desktop-overview.png`);
+    for (const route of ROUTES) await shoot(desk.page, route, `${prefix}desktop-${route}.png`);
+    await shoot(desk.page, 'overview', null);
     await shoot(desk.page, 'overview', `${prefix}desktop-overview-bottom.png`, { scrollToBottom: true });
-    await shoot(desk.page, 'settings', `${prefix}desktop-settings.png`);
     await desk.context.close();
   }
 } finally {

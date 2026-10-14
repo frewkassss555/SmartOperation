@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { useUi, type MarketPeriod } from '../../app/uiStore';
-import { Button, Delta, LineChart, Segmented, Stat } from '../../design';
+import { Button, Columns, Delta, LineChart, Segmented, Stat } from '../../design';
 import { db } from '../../db/db';
 import { formatClock, formatUsd, periodChange, priceRange, trendOf } from '../../lib/market';
 import type { SectionProps } from '../types';
@@ -18,7 +18,7 @@ const PERIODS = [
 
 const GRID_LINES = 4;
 
-export function MarketSection({ compact }: SectionProps) {
+export function MarketSection({ compact, wide }: SectionProps) {
   const period = useUi((s) => s.marketPeriod);
   const setPeriod = useUi((s) => s.setMarketPeriod);
   const setCoin = useUi((s) => s.setCoin);
@@ -34,7 +34,7 @@ export function MarketSection({ compact }: SectionProps) {
   const range = priceRange(points);
   const trend = trendOf(change);
   const width = compact ? 350 : 760;
-  const height = compact ? 180 : 280;
+  const height = compact ? 180 : wide ? 340 : 280;
   const periodLabel = PERIODS.find((p) => p.value === period)!.label;
   const quoteOf = (id: string) => quotes.find((q) => q.coinId === id);
   const updatedAt = Math.max(0, ...quotes.map((q) => q.updatedAt));
@@ -50,8 +50,8 @@ export function MarketSection({ compact }: SectionProps) {
             ? 'Загрузка…'
             : null;
 
-  return (
-    <div className={styles.section}>
+  const main = (
+    <>
       <div className={styles.head}>
         <div className={styles.quote}>
           <span className="label">
@@ -95,7 +95,11 @@ export function MarketSection({ compact }: SectionProps) {
         <span className="label">{updatedAt ? `Обновлено ${formatClock(updatedAt)}` : 'Ещё не обновлялось'}</span>
         {statusText && <span className={`label ${styles.warn}`}>{statusText}</span>}
       </div>
+    </>
+  );
 
+  const side = (
+    <>
       <ul className={styles.coins} aria-label="Наблюдаемые монеты">
         {list.map((w) => {
           const q = quoteOf(w.coinId);
@@ -123,6 +127,12 @@ export function MarketSection({ compact }: SectionProps) {
       <Button variant="secondary" onClick={() => setEditing(true)}>
         Изменить список
       </Button>
+    </>
+  );
+
+  return (
+    <div className={styles.section}>
+      <Columns wide={wide} balance="main" main={main} side={side} />
 
       <WatchDialog open={editing} onClose={() => setEditing(false)} list={list} />
     </div>

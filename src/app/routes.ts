@@ -19,7 +19,8 @@ export const SECTIONS: readonly Section[] = [
   { id: 'market', index: '05', nav: 'Рынок', title: 'Рынок' },
 ];
 
-export const DEFAULT_ROUTE: Route = 'grades';
+/** The overview is the home screen on both layouts. */
+export const DEFAULT_ROUTE: Route = 'overview';
 
 const ROUTES: readonly Route[] = [...SECTIONS.map((s) => s.id), 'settings', 'overview'];
 

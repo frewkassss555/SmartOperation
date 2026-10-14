@@ -1,8 +1,7 @@
-import { useEffect, useRef, type MouseEvent } from 'react';
+import { useEffect, useRef } from 'react';
 import { Delta, Panel, Stat } from '../design';
 import { coinLabel, useSelectedCoin } from '../features/market/coins';
 import { useOverview } from '../features/overview/useOverview';
-import { SettingsSection } from '../features/settings/SettingsSection';
 import { formatUsd } from '../lib/market';
 import { formatFullDate, formatHeaderDate, isoWeek, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
@@ -20,68 +19,42 @@ const ROWS: readonly (readonly SectionId[])[] = [
 const demoNote = (demo: boolean) =>
   demo ? 'Добавлены демо-данные. Очистить: Настройки → Удалить всё.' : 'Демо-данные выключены. Их можно добавить в настройках.';
 
-const panelId = (id: SectionId) => `panel-${id}`;
-
-function jumpTo(id: SectionId) {
-  const panel = document.getElementById(panelId(id));
-  if (!panel) return;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  panel.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
-  panel.focus({ preventScroll: true });
-}
-
+/**
+ * Desktop: the overview shows every section as a panel; choosing a section (sidebar or a
+ * panel's "Открыть") opens it full screen with room for all of its tools.
+ */
 export function DesktopShell({ route }: { route: Route }) {
   const today = useToday();
-  const coin = useSelectedCoin();
   const overview = useOverview();
-  const title = overviewTitle(today);
-  const isSettings = route === 'settings';
-  const prevRoute = useRef(route);
-
   const mainRef = useRef<HTMLElement>(null);
+  const section = SECTIONS.find((s) => s.id === route);
+  const isSettings = route === 'settings';
 
-  // Navigation scrolls to the panel; the initial load keeps the overview header in view.
-  // Switching between the overview and settings starts at the top.
+  // Every screen starts at the top.
   useEffect(() => {
-    if (prevRoute.current === route) return;
-    const fromSettings = prevRoute.current === 'settings';
-    prevRoute.current = route;
-    if (route === 'settings' || route === 'overview') mainRef.current?.scrollTo(0, 0);
-    else if (fromSettings) requestAnimationFrame(() => jumpTo(route));
-    else jumpTo(route);
+    mainRef.current?.scrollTo(0, 0);
   }, [route]);
-
-  const onNavClick = (event: MouseEvent, id: SectionId) => {
-    // Clicking the current section does not fire hashchange; scroll explicitly.
-    if (id === route) {
-      event.preventDefault();
-      jumpTo(id);
-    }
-  };
-
-  const renderPanel = (section: Section) => {
-    const View = SECTION_VIEWS[section.id];
-    return (
-      <Panel
-        key={section.id}
-        id={panelId(section.id)}
-        className={styles[section.id]}
-        title={section.title}
-        index={section.index}
-        focusable
-      >
-        <View compact={false} />
-      </Panel>
-    );
-  };
 
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <a href={routeHref('overview')} className={styles.brandRow} aria-label="Трекер, обзор">
+        <a
+          href={routeHref('overview')}
+          className={route === 'overview' ? `${styles.brandRow} ${styles.brandActive}` : styles.brandRow}
+          aria-current={route === 'overview' ? 'page' : undefined}
+          aria-label="Трекер, обзор"
+        >
           <Brand />
         </a>
         <nav aria-label="Разделы">
+          <a
+            href={routeHref('overview')}
+            className={route === 'overview' ? `${styles.navItem} ${styles.active}` : styles.navItem}
+            aria-current={route === 'overview' ? 'page' : undefined}
+          >
+            <span className={styles.navIndex}>00</span>
+            <span className={styles.navLabel}>Обзор</span>
+          </a>
           {SECTIONS.map((s) => {
             const active = s.id === route;
             return (
@@ -89,8 +62,7 @@ export function DesktopShell({ route }: { route: Route }) {
                 key={s.id}
                 href={routeHref(s.id)}
                 className={active ? `${styles.navItem} ${styles.active}` : styles.navItem}
-                aria-current={active ? 'true' : undefined}
-                onClick={(e) => onNavClick(e, s.id)}
+                aria-current={active ? 'page' : undefined}
               >
                 <span className={styles.navIndex}>{s.index}</span>
                 <span className={styles.navLabel}>{s.nav}</span>
@@ -100,12 +72,12 @@ export function DesktopShell({ route }: { route: Route }) {
         </nav>
         <div className={styles.sidebarFoot}>
           <a
-            href={isSettings ? routeHref('overview') : routeHref('settings')}
+            href={routeHref('settings')}
             className={isSettings ? `${styles.navItem} ${styles.active}` : styles.navItem}
             aria-current={isSettings ? 'page' : undefined}
           >
-            <span className={styles.navIndex}>{isSettings ? '←' : '—'}</span>
-            <span className={styles.navLabel}>{isSettings ? 'К обзору' : 'Настройки'}</span>
+            <span className={styles.navIndex}>—</span>
+            <span className={styles.navLabel}>Настройки</span>
           </a>
           <div className={styles.meta}>
             <span className="label">Сегодня</span>
@@ -120,8 +92,21 @@ export function DesktopShell({ route }: { route: Route }) {
       <div className={styles.column}>
         <header className={styles.header}>
           <span className={styles.crumb}>
-            {isSettings ? 'Настройки' : 'Обзор'}
-            <span className={styles.crumbHint}>{isSettings ? '' : 'Все разделы'}</span>
+            {section ? (
+              <>
+                <a href={routeHref('overview')} className={styles.crumbLink}>
+                  Обзор
+                </a>
+                <span className={styles.crumbHint}>/</span>
+                {section.title}
+              </>
+            ) : isSettings ? (
+              'Настройки'
+            ) : (
+              <>
+                Обзор<span className={styles.crumbHint}>Все разделы</span>
+              </>
+            )}
           </span>
           <span className={styles.headerMeta}>
             <span>Неделя {isoWeek(today)}</span>
@@ -130,45 +115,8 @@ export function DesktopShell({ route }: { route: Route }) {
         </header>
 
         <main className={styles.main} ref={mainRef}>
-          <div className={styles.content}>
-            {isSettings ? (
-              <>
-                <h1 className={styles.title}>Настройки</h1>
-                <SettingsSection compact={false} />
-              </>
-            ) : (
-              <>
-                <h1 className={styles.title}>
-                  {title.weekday}
-                  <span className={styles.dot}>.</span>
-                  {title.day}
-                </h1>
-
-                <div className={styles.stats}>
-                  <Stat className={styles.stat} label="Средний балл" value={overview.average} tone="accent" />
-                  <Stat className={styles.stat} label="Баланс" value={overview.balance} />
-                  <Stat
-                    className={styles.stat}
-                    label="Уроков сегодня"
-                    value={overview.lessonsToday}
-                    hint={
-                      overview.status
-                        ? `${overview.status.kind === 'lesson' ? 'Сейчас' : 'Дальше'}: ${overview.subjectName(overview.status.lesson.subjectId)}`
-                        : undefined
-                    }
-                  />
-                  <Stat className={styles.stat} label={`${coinLabel(coin.watch)} / USD`} value={formatUsd(coin.quote?.price)} hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />} />
-                </div>
-
-                <div className={styles.rows}>
-                  {ROWS.map((row) => (
-                    <div key={row.join('-')} className={styles.row}>
-                      {row.map((id) => renderPanel(SECTIONS.find((s) => s.id === id)!))}
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+          <div className={styles.content} key={route}>
+            {section ? <SectionPage section={section} /> : isSettings ? <SettingsPage /> : <OverviewPage overview={overview} />}
           </div>
 
           <footer className={styles.footer}>
@@ -178,5 +126,98 @@ export function DesktopShell({ route }: { route: Route }) {
         </main>
       </div>
     </div>
+  );
+}
+
+function SectionPage({ section }: { section: Section }) {
+  const View = SECTION_VIEWS[section.id];
+  return (
+    <>
+      <div className={styles.pageHead}>
+        <h1 className={styles.title}>{section.title}</h1>
+        <span className={styles.counter}>
+          {section.index} / {String(SECTIONS.length).padStart(2, '0')}
+        </span>
+      </div>
+      <div className="appear">
+        <View compact={false} wide />
+      </div>
+    </>
+  );
+}
+
+function SettingsPage() {
+  const View = SECTION_VIEWS.settings;
+  return (
+    <>
+      <h1 className={styles.title}>Настройки</h1>
+      <View compact={false} wide />
+    </>
+  );
+}
+
+function OverviewPage({ overview }: { overview: ReturnType<typeof useOverview> }) {
+  const today = useToday();
+  const coin = useSelectedCoin();
+  const title = overviewTitle(today);
+
+  return (
+    <>
+      <h1 className={styles.title}>
+        {title.weekday}
+        <span className={styles.dot}>.</span>
+        {title.day}
+      </h1>
+
+      <div className={styles.stats}>
+        <Stat className={styles.stat} label="Средний балл" value={overview.average} tone="accent" />
+        <Stat className={styles.stat} label="Баланс" value={overview.balance} />
+        <Stat
+          className={styles.stat}
+          label="Уроков сегодня"
+          value={overview.lessonsToday}
+          hint={
+            overview.status
+              ? `${overview.status.kind === 'lesson' ? 'Сейчас' : 'Дальше'}: ${overview.subjectName(overview.status.lesson.subjectId)}`
+              : undefined
+          }
+        />
+        <Stat
+          className={styles.stat}
+          label={`${coinLabel(coin.watch)} / USD`}
+          value={formatUsd(coin.quote?.price)}
+          hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />}
+        />
+      </div>
+
+      <div className={styles.rows}>
+        {ROWS.map((row) => (
+          <div key={row.join('-')} className={styles.row}>
+            {row.map((id) => {
+              const s = SECTIONS.find((x) => x.id === id)!;
+              const View = SECTION_VIEWS[id];
+              return (
+                <Panel
+                  key={id}
+                  className={styles[id]}
+                  title={s.title}
+                  index={s.index}
+                  aside={
+                    <a href={routeHref(id)} className={styles.open} aria-label={`Открыть раздел ${s.title} на весь экран`}>
+                      Открыть
+                      <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+                        <path d="M3 1 L8 6 L3 11" stroke="currentColor" strokeWidth="2" fill="none" />
+                      </svg>
+                    </a>
+                  }
+                >
+                  <View compact={false} />
+                </Panel>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </>
   );
 }

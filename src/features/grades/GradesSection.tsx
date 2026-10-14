@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bar, Button, EmptyState, Stat } from '../../design';
+import { Bar, Button, Columns, EmptyState, Stat } from '../../design';
 import { useSettings } from '../../db/settings';
 import type { Grade } from '../../db/types';
 import { formatAverage, scaleBlocks, type GradeScale } from '../../lib/grades';
@@ -16,7 +16,7 @@ const PLATES = 9;
 
 type GradeEditor = { subjectId: string; grade?: Grade | undefined };
 
-export function GradesSection(_: SectionProps) {
+export function GradesSection({ wide }: SectionProps) {
   const data = useGradesData();
   const { gradeScale } = useSettings();
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -30,8 +30,7 @@ export function GradesSection(_: SectionProps) {
   const detail = find(detailId);
   const editorSubject = find(gradeEditor?.subjectId);
 
-  return (
-    <div className={styles.section}>
+  const summary = (
       <div className={styles.summary}>
         <Stat className={styles.average} label="Средний балл" value={formatAverage(data.overall)} size="average" tone="accent" />
         <div className={styles.cells}>
@@ -39,8 +38,9 @@ export function GradesSection(_: SectionProps) {
           <Stat className={styles.cell} label="Лучший предмет" value={data.best?.subject.name ?? '—'} size="sm" />
         </div>
       </div>
+  );
 
-      {!data.loading && data.active.length === 0 && (
+  const empty = !data.loading && data.active.length === 0 && (
         <EmptyState
           title="Предметов пока нет"
           action={
@@ -51,9 +51,9 @@ export function GradesSection(_: SectionProps) {
         >
           Добавьте предмет, и здесь появятся оценки, средний балл и шкала прогресса.
         </EmptyState>
-      )}
+  );
 
-      {data.active.length > 0 && (
+  const list = data.active.length > 0 && (
         <ul className={`${styles.subjects} appear`}>
           {data.active.map((s) => (
             <SubjectRow
@@ -64,18 +64,19 @@ export function GradesSection(_: SectionProps) {
               onToggle={() => setExpanded(expanded === s.subject.id ? null : s.subject.id)}
               onOpen={() => setDetailId(s.subject.id)}
               onEditGrade={(grade) => setGradeEditor({ subjectId: s.subject.id, grade })}
+              plates={wide ? 16 : PLATES}
             />
           ))}
         </ul>
-      )}
+  );
 
-      {data.active.length > 0 && (
+  const add = data.active.length > 0 && (
         <Button variant="secondary" onClick={() => setNameDialog({})}>
           Добавить предмет +
         </Button>
-      )}
+  );
 
-      {data.archived.length > 0 && (
+  const archive = data.archived.length > 0 && (
         <div className={styles.archive}>
           <button type="button" className={styles.archiveToggle} aria-expanded={showArchive} onClick={() => setShowArchive(!showArchive)}>
             <span className="label">Архив · {data.archived.length}</span>
@@ -94,6 +95,31 @@ export function GradesSection(_: SectionProps) {
             </ul>
           )}
         </div>
+  );
+
+  return (
+    <div className={styles.section}>
+      {wide ? (
+        <Columns
+          wide
+          main={
+            <>
+              {summary}
+              {empty}
+              {add}
+              {archive}
+            </>
+          }
+          side={list}
+        />
+      ) : (
+        <>
+          {summary}
+          {empty}
+          {list}
+          {add}
+          {archive}
+        </>
       )}
 
       <SubjectDialog
@@ -132,11 +158,12 @@ type SubjectRowProps = {
   onToggle: () => void;
   onOpen: () => void;
   onEditGrade: (grade: Grade) => void;
+  plates: number;
 };
 
-function SubjectRow({ stats, scale, expanded, onToggle, onOpen, onEditGrade }: SubjectRowProps) {
+function SubjectRow({ stats, scale, expanded, onToggle, onOpen, onEditGrade, plates }: SubjectRowProps) {
   const { subject, grades, average } = stats;
-  const recent = grades.slice(-PLATES);
+  const recent = grades.slice(-plates);
   const pickerId = `quick-${subject.id}`;
 
   return (

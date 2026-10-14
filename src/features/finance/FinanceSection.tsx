@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useToday } from '../../app/hooks';
 import { useUi, type FinanceRange, type ListPeriod } from '../../app/uiStore';
-import { Button, Chip, EmptyState, Segmented, Stat } from '../../design';
+import { Button, Chip, Columns, EmptyState, Segmented, Stat } from '../../design';
 import { useSettings } from '../../db/settings';
 import type { Txn } from '../../db/types';
 import { formatDayMonth, toIsoDate, WEEK_DAYS } from '../../lib/date';
@@ -28,7 +28,7 @@ const BAR_MAX = 80;
 /** Rows shown in the desktop panel before "show all", so the panel row stays compact. */
 const PANEL_ROWS = 8;
 
-export function FinanceSection({ compact }: SectionProps) {
+export function FinanceSection({ compact, wide }: SectionProps) {
   const today = useToday();
   const todayIso = toIsoDate(today);
   const txns = useTxns();
@@ -54,14 +54,16 @@ export function FinanceSection({ compact }: SectionProps) {
       (category === null || t.category === category) &&
       (listDates === null || (t.date >= listDates[0]! && t.date <= listDates.at(-1)!)),
   );
-  const limited = !compact && !showAll && list.length > PANEL_ROWS;
+  // The overview panel shows a short list; the phone and the full-screen section show all.
+  const capped = !compact && !wide;
+  const limited = capped && !showAll && list.length > PANEL_ROWS;
   const shown = limited ? list.slice(0, PANEL_ROWS) : list;
   const usedCategories = settings.categories.filter((c) => all.some((t) => t.category === c));
   const money = (minor: number) => formatMoney(minor, settings.currency);
   const rangeWord = range === 'week' ? 'за неделю' : 'за месяц';
 
-  return (
-    <div className={styles.section}>
+  const head = (
+    <>
       <div className={styles.summary}>
         <Stat className={styles.balance} label="Баланс" value={money(balance(settings.startBalance, all))} size="lg" tone="accent" />
         <div className={styles.flows}>
@@ -104,8 +106,11 @@ export function FinanceSection({ compact }: SectionProps) {
           })}
         </div>
       </div>
+    </>
+  );
 
-      {txns !== undefined && all.length === 0 ? (
+  const body =
+    txns !== undefined && all.length === 0 ? (
         <EmptyState
           title="Операций пока нет"
           action={
@@ -162,13 +167,17 @@ export function FinanceSection({ compact }: SectionProps) {
               ))}
             </ul>
           )}
-          {!compact && list.length > PANEL_ROWS && (
+          {capped && list.length > PANEL_ROWS && (
             <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
               {showAll ? 'Свернуть' : `Показать все · ${list.length}`}
             </Button>
           )}
         </>
-      )}
+      );
+
+  return (
+    <div className={styles.section}>
+      <Columns wide={wide} main={head} side={body} />
 
       <TxnDialog
         open={editor !== null}

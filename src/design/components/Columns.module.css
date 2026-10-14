@@ -1,0 +1,30 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.container {
+  container-type: inline-size;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Side by side once the section area is wide enough; below that, one column. */
+@container (min-width: 860px) {
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 40px;
+  }
+
+  .mainHeavy {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  }
+}
