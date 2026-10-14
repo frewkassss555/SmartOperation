@@ -302,3 +302,47 @@ button.plate:hover {
   font-size: 12px;
   color: var(--negative);
 }
+
+/* Target calculator */
+
+.calc {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.calcInputs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.calcTarget {
+  width: 140px;
+}
+
+.calcTarget input {
+  font-family: var(--font-mono);
+  font-size: 20px;
+}
+
+.calcAnswer {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.calcLead {
+  color: var(--text);
+}
+
+.calcMuted {
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}

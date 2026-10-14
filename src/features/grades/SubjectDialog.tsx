@@ -4,6 +4,7 @@ import { formatDayMonth } from '../../lib/date';
 import { formatAverage, weeklyAverages, type GradeScale } from '../../lib/grades';
 import { deleteSubject, setArchived, type SubjectStats } from './data';
 import styles from './Grades.module.css';
+import { TargetCalc } from './TargetCalc';
 
 type Props = {
   stats: SubjectStats | undefined;
@@ -69,6 +70,8 @@ export function SubjectDialog({ stats, scale, onClose, onAddGrade, onEditGrade, 
               <p className={styles.muted}>График появится, когда оценки будут хотя бы за две недели.</p>
             )}
           </div>
+
+          <TargetCalc key={stats.subject.id} grades={stats.grades} scale={scale} />
 
           <Button variant="primary" block onClick={onAddGrade}>
             Добавить оценку +
