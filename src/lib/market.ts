@@ -79,6 +79,20 @@ export function nextBackoff(currentMs: number): number {
   return Math.min(15 * 60_000, Math.max(120_000, currentMs * 2));
 }
 
+export type FailureState = { state: 'limited' | 'error' | 'offline'; backoffMs: number; pausedUntil: number };
+
+/**
+ * What to do after a failed quotes request. CoinGecko sends its 429 without CORS headers,
+ * so in the browser a rate limit usually looks like a plain network error: any failure while
+ * online therefore backs off. Offline there is nothing to back off from; the "online" event
+ * triggers a retry instead.
+ */
+export function failureState(rateLimited: boolean, online: boolean, currentBackoffMs: number, now: number): FailureState {
+  if (!online) return { state: 'offline', backoffMs: currentBackoffMs, pausedUntil: 0 };
+  const backoffMs = nextBackoff(currentBackoffMs);
+  return { state: rateLimited ? 'limited' : 'error', backoffMs, pausedUntil: now + backoffMs };
+}
+
 /** "14:20" */
 export function formatClock(ms: number): string {
   const d = new Date(ms);

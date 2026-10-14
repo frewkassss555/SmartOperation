@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { downsample, formatPercent, formatUsd, nextBackoff, periodChange, priceRange, trendOf, type Point } from './market';
+import { downsample, failureState, formatPercent, formatUsd, nextBackoff, periodChange, priceRange, trendOf, type Point } from './market';
 
 const series = (n: number): Point[] => Array.from({ length: n }, (_, i) => [i * 1000, 100 + i]);
 
@@ -55,6 +55,13 @@ describe('formatting', () => {
     expect(formatPercent(-0.87)).toBe('−0,87 %');
     expect(formatPercent(0.001)).toBe('0,00 %');
     expect(formatPercent(undefined)).toBe('—');
+  });
+
+  it('backs off after any failure while online, not while offline', () => {
+    // A 429 without CORS headers arrives as a plain network error: still back off.
+    expect(failureState(false, true, 0, 1000)).toEqual({ state: 'error', backoffMs: 120_000, pausedUntil: 121_000 });
+    expect(failureState(true, true, 120_000, 0)).toEqual({ state: 'limited', backoffMs: 240_000, pausedUntil: 240_000 });
+    expect(failureState(false, false, 240_000, 0)).toEqual({ state: 'offline', backoffMs: 240_000, pausedUntil: 0 });
   });
 
   it('backs off exponentially with a cap', () => {

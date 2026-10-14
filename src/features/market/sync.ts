@@ -5,7 +5,7 @@ import { useUi } from '../../app/uiStore';
 import { db } from '../../db/db';
 import type { Watch } from '../../db/types';
 import { fetchChart, fetchMarkets, RateLimitError } from '../../lib/coingecko';
-import { downsample, nextBackoff } from '../../lib/market';
+import { downsample, failureState } from '../../lib/market';
 import { evaluateAlerts } from './alerts';
 
 /** Quotes refresh period while the tab is visible; also the per-request throttle. */
@@ -15,7 +15,7 @@ export type SyncState = 'idle' | 'loading' | 'ok' | 'offline' | 'limited' | 'err
 
 type MarketStatus = {
   state: SyncState;
-  /** While rate limited: no requests before this time (epoch ms). */
+  /** After a failure while online: no requests before this time (epoch ms). */
   pausedUntil: number;
   backoffMs: number;
 };
@@ -31,12 +31,10 @@ function throttled(key: string, now: number): boolean {
 }
 
 function fail(error: unknown) {
-  if (error instanceof RateLimitError) {
-    const backoffMs = nextBackoff(useMarketStatus.getState().backoffMs);
-    useMarketStatus.setState({ state: 'limited', backoffMs, pausedUntil: Date.now() + backoffMs });
-  } else {
-    useMarketStatus.setState({ state: navigator.onLine ? 'error' : 'offline' });
-  }
+  const now = Date.now();
+  // Quotes and chart fail together: one failure round extends the pause only once.
+  if (paused(now)) return;
+  useMarketStatus.setState(failureState(error instanceof RateLimitError, navigator.onLine, useMarketStatus.getState().backoffMs, now));
 }
 
 // Offline, the service worker may still answer from its cache: the data is the last saved one.

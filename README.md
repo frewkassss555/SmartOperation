@@ -2,7 +2,7 @@
 
 An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device in IndexedDB. The only network request is for crypto quotes (CoinGecko). The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
 
-**Status:** stage 3 of 5. All five sections, overview and settings work. Quotes update every minute and stay visible offline. The app installs and works without a network.
+**Status:** stage 4 of 5. All five sections, the overview and settings work offline, plus the stage 4 extras: grade target calculator, deadlines, focus timer with an activity grid, category limits and a savings goal, price alerts, a notional portfolio, Ctrl+K quick entry and a Sunday weekly summary. On the desktop each section opens full screen; the overview shows them all as panels.
 
 ## Requirements
 
@@ -36,12 +36,14 @@ On Windows PowerShell with script execution disabled, use `npm.cmd` instead of `
 src/
   app/        shell, navigation, hash router, UI state (Zustand), undo and update bars
   design/     tokens.css, base.css, fonts, components (Panel, Stat, Chip, Segmented, Button,
-              Field, Bar, EmptyState, Dialog, LineChart, Delta)
+              Field, Bar, EmptyState, Dialog, LineChart, Delta, Columns)
   db/         Dexie schema and migrations, settings, export/import, demo data, recurring transactions
-  features/   grades, finance, schedule, notes, market, overview, settings
-  lib/        pure logic with tests: dates, money, grades, recurring, schedule, notes, market,
-              CoinGecko client
-  pwa/        service worker registration, install prompt
+  features/   grades, finance, schedule, notes, market, overview, settings,
+              tasks (deadlines), focus, command (Ctrl+K)
+  lib/        pure logic with tests: dates, money, grades, grade calculator, recurring, schedule,
+              notes, market, CoinGecko client, tasks, focus, budget, alerts, portfolio, quick-entry
+              parser, weekly summary
+  pwa/        service worker registration, install prompt, notifications
 public/       favicon and PWA icons
 scripts/      screenshot, smoke and icon scripts
 ```
@@ -49,7 +51,7 @@ scripts/      screenshot, smoke and icon scripts
 ## Data
 
 - Money is stored as integer minor units (kopecks); dates as `YYYY-MM-DD` strings.
-- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`, currently 2) and migrations are tested.
+- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`, currently 3) and migrations are tested.
 - Export is one JSON file with all user tables and a `version` field. Import validates it and offers replace or merge. Quote caches are not exported.
 
 ## Offline and quotes
@@ -57,6 +59,11 @@ scripts/      screenshot, smoke and icon scripts
 - The service worker (Workbox via vite-plugin-pwa) precaches the whole shell: JS, CSS, fonts and icons.
 - CoinGecko requests are network-first with a 4-second timeout and fall back to the cache. Responses are also stored in IndexedDB. The UI shows the last saved prices with the time ("ОБНОВЛЕНО 14:20").
 - Quotes refresh every 60 seconds while the tab is visible. After a 429 the app waits 2, 4, 8 and at most 15 minutes before trying again.
+
+## Keyboard (desktop)
+
+- `Ctrl+K` / `Cmd+K`: quick entry, e.g. `оценка информатика 9`, `расход 6.4 транспорт`, `заметка идея для проекта`.
+- `1`–`5`: open a section; `0`: the overview.
 
 ## Design rules
 

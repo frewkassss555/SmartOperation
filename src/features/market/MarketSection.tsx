@@ -49,7 +49,7 @@ export function MarketSection({ compact, wide }: SectionProps) {
       : status.state === 'limited'
         ? `Лимит запросов · пауза до ${formatClock(status.pausedUntil)}`
         : status.state === 'error'
-          ? 'Ошибка обновления · сохранённые цены'
+          ? `Сервер котировок не ответил · повтор после ${formatClock(status.pausedUntil)}`
           : status.state === 'loading' && !updatedAt
             ? 'Загрузка…'
             : null;
