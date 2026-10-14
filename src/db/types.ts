@@ -67,7 +67,17 @@ export type FocusSession = {
 };
 
 /** A watched coin. Symbol and name are kept so the list renders offline before any quote. */
-export type Watch = { coinId: string; order: number; symbol?: string | undefined; name?: string | undefined };
+export type Watch = {
+  coinId: string;
+  order: number;
+  symbol?: string | undefined;
+  name?: string | undefined;
+  /** Price alerts in USD; fired flags keep an alert from repeating until the price returns. */
+  alertAbove?: number | undefined;
+  alertBelow?: number | undefined;
+  firedAbove?: boolean | undefined;
+  firedBelow?: boolean | undefined;
+};
 
 /** Cache: last known quote of a coin (schema v2). */
 export type Quote = {

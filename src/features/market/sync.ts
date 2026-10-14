@@ -6,6 +6,7 @@ import { db } from '../../db/db';
 import type { Watch } from '../../db/types';
 import { fetchChart, fetchMarkets, RateLimitError } from '../../lib/coingecko';
 import { downsample, nextBackoff } from '../../lib/market';
+import { evaluateAlerts } from './alerts';
 
 /** Quotes refresh period while the tab is visible; also the per-request throttle. */
 export const REFRESH_MS = 60_000;
@@ -60,6 +61,7 @@ export async function refreshQuotes(force = false): Promise<void> {
       for (const q of quotes) await db.watch.update(q.id, { symbol: q.symbol, name: q.name });
     });
     succeed();
+    await evaluateAlerts();
   } catch (error) {
     fail(error);
   }

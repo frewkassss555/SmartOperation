@@ -1,13 +1,15 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useState } from 'react';
 import { useUi, type MarketPeriod } from '../../app/uiStore';
-import { Button, Columns, Delta, LineChart, Segmented, Stat } from '../../design';
+import { Button, Chip, Columns, Delta, LineChart, Segmented, Stat } from '../../design';
+import type { Watch } from '../../db/types';
 import { db } from '../../db/db';
 import { formatClock, formatUsd, periodChange, priceRange, trendOf } from '../../lib/market';
 import type { SectionProps } from '../types';
 import { coinLabel, useSelectedCoin } from './coins';
 import styles from './MarketSection.module.css';
 import { useMarketStatus, useWatchList } from './sync';
+import { CoinDialog } from './CoinDialog';
 import { WatchDialog } from './WatchDialog';
 
 const PERIODS = [
@@ -28,6 +30,7 @@ export function MarketSection({ compact, wide }: SectionProps) {
   const quotes = useLiveQuery(() => db.quotes.toArray(), []) ?? [];
   const chart = useLiveQuery(() => db.charts.get(`${watch.coinId}:${period}`), [watch.coinId, period]);
   const [editing, setEditing] = useState(false);
+  const [alertsFor, setAlertsFor] = useState<Watch | null>(null);
 
   const points = chart?.points ?? [];
   const change = periodChange(points);
@@ -95,6 +98,22 @@ export function MarketSection({ compact, wide }: SectionProps) {
         <span className="label">{updatedAt ? `Обновлено ${formatClock(updatedAt)}` : 'Ещё не обновлялось'}</span>
         {statusText && <span className={`label ${styles.warn}`}>{statusText}</span>}
       </div>
+
+      <div className={styles.alertRow}>
+        <span className={styles.alertSummary}>
+          <span className="label">Алерты {coinLabel(watch)}</span>
+          <span className={styles.mono}>
+            {watch.alertAbove === undefined && watch.alertBelow === undefined
+              ? 'не заданы'
+              : [watch.alertAbove !== undefined && `выше ${formatUsd(watch.alertAbove)}`, watch.alertBelow !== undefined && `ниже ${formatUsd(watch.alertBelow)}`]
+                  .filter(Boolean)
+                  .join(' · ')}
+          </span>
+        </span>
+        <Button variant="secondary" onClick={() => setAlertsFor(watch)}>
+          Настроить алерты
+        </Button>
+      </div>
     </>
   );
 
@@ -113,7 +132,11 @@ export function MarketSection({ compact, wide }: SectionProps) {
                 onClick={() => setCoin(w.coinId)}
               >
                 <span className={styles.symbol}>{coinLabel(w)}</span>
-                <span className={styles.coinName}>{w.name ?? w.coinId}</span>
+                <span className={styles.coinName}>
+                  <span className={styles.coinNameText}>{w.name ?? w.coinId}</span>
+                  {w.firedAbove && <Chip filled>Выше {formatUsd(w.alertAbove)}</Chip>}
+                  {w.firedBelow && <Chip filled>Ниже {formatUsd(w.alertBelow)}</Chip>}
+                </span>
                 <span className={styles.coinPrice}>{formatUsd(q?.price)}</span>
                 <span className={styles.coinChange}>
                   <Delta value={q?.change24h} suffix="24Ч" />
@@ -135,6 +158,7 @@ export function MarketSection({ compact, wide }: SectionProps) {
       <Columns wide={wide} balance="main" main={main} side={side} />
 
       <WatchDialog open={editing} onClose={() => setEditing(false)} list={list} />
+      <CoinDialog watch={alertsFor} quote={quoteOf(alertsFor?.coinId ?? '')} onClose={() => setAlertsFor(null)} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { addDemoData } from '../../db/demo';
 import { updateSettings, useSettings } from '../../db/settings';
 import type { GradeScale } from '../../lib/grades';
 import { formatMinor, minorToInput, parseSignedMoney } from '../../lib/money';
+import { PUSH_NOTE } from '../../pwa/notifications';
 import { isIos, promptInstall, usePwa } from '../../pwa/pwa';
 import type { SectionProps } from '../types';
 import styles from './Settings.module.css';
@@ -213,6 +214,10 @@ export function SettingsSection(_: SectionProps) {
 
       <Group title="Приложение">
         <InstallBlock />
+        <div className={styles.block}>
+          <span className="label">Уведомления и алерты по цене</span>
+          <p className={styles.note}>{PUSH_NOTE}</p>
+        </div>
       </Group>
 
       <Group title="Данные">

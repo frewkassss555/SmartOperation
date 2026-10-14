@@ -126,11 +126,7 @@
 
 /* Narrow phones: the ticker is enough, the full name gives way to price and change. */
 @media (max-width: 420px) {
-  .coin {
-    grid-template-columns: 48px minmax(0, 1fr) auto;
-  }
-
-  .coin .coinName {
+  .coin .coinNameText {
     display: none;
   }
 }
@@ -191,4 +187,58 @@
 
 .selected {
   border-left-color: var(--accent);
+}
+
+/* Alerts */
+
+.alertRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.alertSummary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.coinName {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.coinNameText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alertFields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.note {
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}
+
+.permission {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }

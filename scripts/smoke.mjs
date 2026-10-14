@@ -138,6 +138,13 @@ try {
   await page.getByRole('button', { name: /^DOGE/ }).click();
   await expectVisible(page.getByText(/Dogecoin · DOGE \/ USD/), 'DOGE selected');
 
+  step = 'market: price alert fires once';
+  await page.getByRole('button', { name: 'Настроить алерты' }).click();
+  await dialog.getByLabel('Цена выше, $').fill('0,1');
+  await dialog.getByRole('button', { name: 'Сохранить' }).click();
+  await expectVisible(page.getByText(/^DOGE выше \$0,1000/), 'in-app alert bar');
+  await expectVisible(page.getByText('Выше $0,1000'), 'alert chip in the list');
+
   await context.close();
 
   step = 'focus timer: 25 minutes, then a break';
