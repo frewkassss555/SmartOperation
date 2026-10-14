@@ -1,5 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Delta, Panel, Stat } from '../design';
+import { CommandPalette } from '../features/command/CommandPalette';
+import commandStyles from '../features/command/Command.module.css';
+import { useHotkeys } from '../features/command/useHotkeys';
 import { FocusIndicator } from '../features/focus/FocusIndicator';
 import { coinLabel, useSelectedCoin } from '../features/market/coins';
 import { useOverview } from '../features/overview/useOverview';
@@ -30,6 +33,8 @@ export function DesktopShell({ route }: { route: Route }) {
   const mainRef = useRef<HTMLElement>(null);
   const section = SECTIONS.find((s) => s.id === route);
   const isSettings = route === 'settings';
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  useHotkeys(useCallback(() => setPaletteOpen(true), []));
 
   // Every screen starts at the top.
   useEffect(() => {
@@ -110,6 +115,9 @@ export function DesktopShell({ route }: { route: Route }) {
             )}
           </span>
           <span className={styles.headerMeta}>
+            <button type="button" className={commandStyles.trigger} onClick={() => setPaletteOpen(true)} aria-keyshortcuts="Control+K">
+              Быстрый ввод <span className={commandStyles.kbd}>Ctrl K</span>
+            </button>
             <FocusIndicator />
             <span>Неделя {isoWeek(today)}</span>
             <span>{formatHeaderDate(today)}</span>
@@ -127,6 +135,7 @@ export function DesktopShell({ route }: { route: Route }) {
           </footer>
         </main>
       </div>
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }

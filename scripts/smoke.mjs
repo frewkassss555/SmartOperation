@@ -185,6 +185,19 @@ try {
   await expectVisible(dp.getByRole('heading', { level: 1, name: 'Расписание' }), 'schedule page');
   await dp.getByRole('link', { name: 'Трекер, обзор' }).click();
   await expectVisible(dp.getByRole('link', { name: 'Открыть раздел Оценки на весь экран' }), 'back to overview');
+
+  step = 'desktop: Ctrl+K quick entry and number keys';
+  await dp.keyboard.press('Control+KeyK');
+  await dp.getByRole('dialog').getByLabel('Команда').fill('расход 6.4 транспорт');
+  await expectVisible(dp.getByText('Расход 6,40\u00a0Br · Транспорт').first(), 'command preview');
+  await dp.keyboard.press('Enter');
+  await expectVisible(dp.getByRole('status').getByText('Расход 6,40\u00a0Br · Транспорт'), 'command done');
+  await dp.locator('body').click({ position: { x: 5, y: 5 } });
+  await dp.keyboard.press('2');
+  await expectVisible(dp.getByRole('heading', { level: 1, name: 'Финансы' }), 'key 2 opens finance');
+  await expectVisible(dp.getByText('−6,40\u00a0Br').first(), 'quick expense listed');
+  await dp.keyboard.press('0');
+  await expectVisible(dp.getByRole('link', { name: 'Открыть раздел Финансы на весь экран' }), 'key 0 opens overview');
   await desk.close();
 
   step = 'pwa: manifest and offline';
