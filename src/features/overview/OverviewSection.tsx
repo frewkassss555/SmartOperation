@@ -8,6 +8,7 @@ import { coinLabel, useSelectedCoin } from '../market/coins';
 import type { SectionProps } from '../types';
 import styles from './Overview.module.css';
 import { useOverview } from './useOverview';
+import { WeeklySummaryBlock } from './WeeklySummaryBlock';
 
 /** Phone overview: the four key numbers and today's lessons. */
 export function OverviewSection(_: SectionProps) {
@@ -16,6 +17,8 @@ export function OverviewSection(_: SectionProps) {
 
   return (
     <div className={styles.section}>
+      <WeeklySummaryBlock />
+
       <div className={styles.stats}>
         <a href={routeHref('grades')} className={styles.cell}>
           <Stat label="Средний балл" value={o.average} tone="accent" />

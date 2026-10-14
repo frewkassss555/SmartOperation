@@ -172,6 +172,21 @@ try {
   await expectVisible(tp.getByText('Готов к старту'), 'back to idle');
   await timed.close();
 
+  step = 'weekly summary on Sunday';
+  const sun = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await mockCoinGecko(sun);
+  const sp = await sun.newPage();
+  sp.on('pageerror', (e) => errors.push(e.message));
+  await sp.clock.setFixedTime(new Date(2026, 9, 18, 12, 0));
+  await sp.goto(`${base}#/settings`);
+  await sp.getByRole('button', { name: 'Добавить демо-данные' }).click();
+  await sp.getByRole('button', { name: 'Демо-данные добавлены' }).waitFor();
+  await sp.goto(`${base}#/overview`);
+  await expectVisible(sp.getByRole('heading', { name: 'Итог недели' }), 'weekly summary');
+  await expectVisible(sp.getByText('12.10 — 18.10'), 'week range');
+  await expectVisible(sp.getByText('Дедлайнов закрыто'), 'closed deadlines cell');
+  await sun.close();
+
   step = 'desktop: sections open full screen';
   const desk = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });
   await mockCoinGecko(desk);

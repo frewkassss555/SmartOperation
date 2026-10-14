@@ -7,18 +7,20 @@ type DeltaProps = {
   /** Text after the number, e.g. "24Ч" or "за 7Д". */
   suffix?: string | undefined;
   size?: 'sm' | 'md';
+  /** Text to show instead of the percentage (the sign and marker still follow the value). */
+  text?: string | undefined;
 };
 
 /**
  * Rise and fall are told apart by sign, marker and colour together:
  * filled square for a rise, empty framed square for a fall, a dash when flat.
  */
-export function Delta({ value, suffix, size = 'sm' }: DeltaProps) {
+export function Delta({ value, suffix, size = 'sm', text }: DeltaProps) {
   const trend = trendOf(value);
   return (
     <span className={`${styles.delta} ${styles[trend]} ${styles[size]}`}>
       <span className={styles.marker} aria-hidden="true" />
-      <span>{formatPercent(value)}</span>
+      <span>{text ?? formatPercent(value)}</span>
       {suffix && <span className={styles.suffix}>{suffix}</span>}
       <span className="visually-hidden">{trend === 'up' ? 'рост' : trend === 'down' ? 'падение' : 'без изменений'}</span>
     </span>

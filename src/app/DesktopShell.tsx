@@ -6,6 +6,7 @@ import { useHotkeys } from '../features/command/useHotkeys';
 import { FocusIndicator } from '../features/focus/FocusIndicator';
 import { coinLabel, useSelectedCoin } from '../features/market/coins';
 import { useOverview } from '../features/overview/useOverview';
+import { WeeklySummaryBlock } from '../features/overview/WeeklySummaryBlock';
 import { formatUsd } from '../lib/market';
 import { formatFullDate, formatHeaderDate, isoWeek, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
@@ -200,6 +201,8 @@ function OverviewPage({ overview }: { overview: ReturnType<typeof useOverview> }
           hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />}
         />
       </div>
+
+      <WeeklySummaryBlock />
 
       <div className={styles.rows}>
         {ROWS.map((row) => (

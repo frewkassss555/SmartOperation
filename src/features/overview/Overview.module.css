@@ -101,3 +101,36 @@
   border-left: var(--rule-strong) solid var(--negative);
   padding-left: 8px;
 }
+/* Sunday weekly summary */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summaryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.summaryHead .heading {
+  margin-bottom: 0;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  padding: 1px 0 0 1px;
+  border-top: var(--rule-strong) solid var(--accent);
+}
+
+.summaryCell {
+  min-width: 0;
+  margin: -1px 0 0 -1px;
+  padding: 16px;
+  border: var(--rule) solid var(--line-strong);
+}
