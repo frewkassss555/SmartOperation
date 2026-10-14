@@ -47,7 +47,7 @@ export function PhoneShell({ route }: { route: Route }) {
         </div>
       </header>
 
-      <main className={styles.main} ref={mainRef}>
+      <main className={styles.main} ref={mainRef} id="content" tabIndex={-1}>
         <div className={styles.screenHead}>
           <h1 className={styles.title}>
             {route === 'overview' ? (

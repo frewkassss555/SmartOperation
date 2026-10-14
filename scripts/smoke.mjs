@@ -35,6 +35,21 @@ try {
   const dialog = page.getByRole('dialog');
   const undo = page.getByRole('button', { name: 'Отменить' });
 
+  step = 'keyboard: skip link and visible focus';
+  await page.goto(`${base}#/overview`);
+  await page.keyboard.press('Tab');
+  const first = await page.evaluate(() => {
+    const el = document.activeElement;
+    const style = el ? getComputedStyle(el) : null;
+    return { text: el?.textContent?.trim(), outline: style?.outlineStyle, width: style?.outlineWidth };
+  });
+  if (first.text !== 'К содержимому' || first.outline === 'none' || first.width !== '2px') {
+    throw new Error(`${step}: first Tab stop ${JSON.stringify(first)}`);
+  }
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  const inMain = await page.evaluate(() => Boolean(document.activeElement?.closest('main')));
+  if (!inMain) throw new Error(`${step}: focus did not move into the content`);
   step = 'grades: add subject';
   await page.goto(`${base}#/grades`);
   await page.getByRole('button', { name: 'Добавить предмет +' }).click();

@@ -24,9 +24,9 @@ export function BudgetBlock({ txns }: { txns: readonly Txn[] }) {
     <div className={styles.budget}>
       <section className={styles.budgetBlock} aria-labelledby="limits-title">
         <div className={styles.budgetHead}>
-          <h3 className={styles.budgetTitle} id="limits-title">
+          <h2 className={styles.budgetTitle} id="limits-title">
             Лимиты на месяц
-          </h3>
+          </h2>
           <Button variant="ghost" onClick={() => setLimitsOpen(true)}>
             Настроить
           </Button>
@@ -64,9 +64,9 @@ export function BudgetBlock({ txns }: { txns: readonly Txn[] }) {
 
       <section className={styles.budgetBlock} aria-labelledby="goal-title">
         <div className={styles.budgetHead}>
-          <h3 className={styles.budgetTitle} id="goal-title">
+          <h2 className={styles.budgetTitle} id="goal-title">
             Цель
-          </h3>
+          </h2>
           <Button variant="ghost" onClick={() => setGoalOpen(true)}>
             {goal ? 'Изменить' : 'Поставить'}
           </Button>

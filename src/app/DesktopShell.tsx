@@ -125,7 +125,7 @@ export function DesktopShell({ route }: { route: Route }) {
           </span>
         </header>
 
-        <main className={styles.main} ref={mainRef}>
+        <main className={styles.main} ref={mainRef} id="content" tabIndex={-1}>
           <div className={styles.content} key={route}>
             {section ? <SectionPage section={section} /> : isSettings ? <SettingsPage /> : <OverviewPage overview={overview} />}
           </div>
