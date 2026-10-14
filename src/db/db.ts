@@ -3,6 +3,7 @@ import {
   DEFAULT_SETTINGS,
   DEFAULT_WATCH,
   type ChartCache,
+  type FocusSession,
   type Grade,
   type Lesson,
   type Note,
@@ -15,7 +16,7 @@ import {
 } from './types';
 
 /** Bump together with a new `this.version(n)` block below; also written into exports. */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export class TrackerDb extends Dexie {
   subjects!: EntityTable<Subject, 'id'>;
@@ -28,6 +29,7 @@ export class TrackerDb extends Dexie {
   settings!: EntityTable<Settings, 'id'>;
   quotes!: EntityTable<Quote, 'coinId'>;
   charts!: EntityTable<ChartCache, 'key'>;
+  focus!: EntityTable<FocusSession, 'id'>;
 
   constructor(name = 'tracker') {
     super(name);
@@ -52,6 +54,9 @@ export class TrackerDb extends Dexie {
         }
       });
 
+    // v3: focus timer sessions.
+    this.version(3).stores({ focus: 'id, date, subjectId' });
+
     this.on('populate', (tx) => {
       void tx.table('settings').add(DEFAULT_SETTINGS);
       void tx.table('watch').bulkAdd(DEFAULT_WATCH);
@@ -62,7 +67,7 @@ export class TrackerDb extends Dexie {
 export const db = new TrackerDb();
 
 /** User data: exported, imported and wiped together. */
-export const TABLES = ['subjects', 'grades', 'txns', 'lessons', 'notes', 'watch', 'tasks', 'settings'] as const;
+export const TABLES = ['subjects', 'grades', 'txns', 'lessons', 'notes', 'watch', 'tasks', 'focus', 'settings'] as const;
 export type TableName = (typeof TABLES)[number];
 
 /** Network caches: rebuilt from the API, so not exported. */

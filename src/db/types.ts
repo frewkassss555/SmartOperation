@@ -55,6 +55,17 @@ export type Note = {
   updatedAt: number;
 };
 
+/** A finished focus interval (schema v3). */
+export type FocusSession = {
+  id: string;
+  subjectId?: string | undefined;
+  /** Day the interval ended, 'YYYY-MM-DD'. */
+  date: string;
+  minutes: number;
+  /** Epoch ms when the interval ended. */
+  endedAt: number;
+};
+
 /** A watched coin. Symbol and name are kept so the list renders offline before any quote. */
 export type Watch = { coinId: string; order: number; symbol?: string | undefined; name?: string | undefined };
 

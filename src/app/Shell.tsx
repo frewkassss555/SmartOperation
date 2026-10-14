@@ -1,3 +1,4 @@
+import { useFocusTicker } from '../features/focus/timer';
 import { useMarketSync } from '../features/market/sync';
 import { DESKTOP_QUERY, useMediaQuery } from './hooks';
 import { DesktopShell } from './DesktopShell';
@@ -11,6 +12,8 @@ export function Shell() {
   const desktop = useMediaQuery(DESKTOP_QUERY);
   // Quotes are the only network traffic: refreshed while the app is open and visible.
   useMarketSync();
+  // The focus timer keeps counting while any screen is open.
+  useFocusTicker();
   return (
     <>
       {desktop ? <DesktopShell route={route} /> : <PhoneShell route={route} />}

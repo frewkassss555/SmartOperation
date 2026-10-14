@@ -3,7 +3,7 @@ import type { GradeScale } from '../lib/grades';
 import { db, newId } from './db';
 import { applyRecurring } from './recurring';
 import { requestPersistenceOnce, updateSettings } from './settings';
-import { DEFAULT_SETTINGS, type Grade, type Lesson, type Note, type Subject, type Task, type Txn } from './types';
+import { DEFAULT_SETTINGS, type FocusSession, type Grade, type Lesson, type Note, type Subject, type Task, type Txn } from './types';
 
 // Deterministic demo set, dated relative to today. Values are written on a 10-point scale
 // and converted to the current grade scale.
@@ -145,13 +145,24 @@ export async function addDemoData(today = new Date()): Promise<void> {
     { id: newId(), title: 'Сдать лабораторную', due: iso(-1), subjectId: subjects[1]!.id, done: true, doneAt: now - 86_400_000 },
   ];
 
-  await db.transaction('rw', [db.subjects, db.grades, db.lessons, db.txns, db.notes, db.tasks, db.settings], async () => {
+  // 12 weeks of focus: a repeating pattern of 0–4 intervals a day, busier closer to today.
+  const PATTERN = [1, 0, 2, 1, 3, 0, 0, 2, 1, 0, 4, 2, 0, 1];
+  const focus: FocusSession[] = [];
+  for (let back = 83; back >= 0; back--) {
+    const count = Math.max(0, PATTERN[back % PATTERN.length]! - (back > 56 ? 1 : 0));
+    for (let k = 0; k < count; k++) {
+      focus.push({ id: newId(), subjectId: subjects[(back + k) % subjects.length]!.id, date: iso(-back), minutes: 25, endedAt: now - back * 86_400_000 });
+    }
+  }
+
+  await db.transaction('rw', [db.subjects, db.grades, db.lessons, db.txns, db.notes, db.tasks, db.focus, db.settings], async () => {
     await db.subjects.bulkAdd(subjects);
     await db.grades.bulkAdd(grades);
     await db.lessons.bulkAdd(lessons);
     await db.txns.bulkAdd(txns);
     await db.notes.bulkAdd(notes);
     await db.tasks.bulkAdd(tasks);
+    await db.focus.bulkAdd(focus);
     await updateSettings({ demo: true });
   });
   await applyRecurring(today);

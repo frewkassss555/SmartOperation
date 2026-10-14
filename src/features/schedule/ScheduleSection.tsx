@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNow } from '../../app/hooks';
-import { useUi } from '../../app/uiStore';
+import { useUi, type PlanTab } from '../../app/uiStore';
 import { Button, Columns, Dialog, EmptyState, Segmented } from '../../design';
 import { useSettings } from '../../db/settings';
 import type { Lesson } from '../../db/types';
 import { defaultSchoolDay, schoolWeek, SCHOOL_DAYS, toIsoDate } from '../../lib/date';
 import { formatDuration, lessonsForDay, lessonStatus, parityOf, type Parity } from '../../lib/schedule';
+import { FocusBlock } from '../focus/FocusBlock';
 import { DeadlinesBlock } from '../tasks/DeadlinesBlock';
 import type { SectionProps } from '../types';
 import { copyDay, useLessons, useSubjects } from './data';
@@ -14,6 +15,12 @@ import styles from './Schedule.module.css';
 
 const DAY_ACC = ['понедельник', 'вторник', 'среду', 'четверг', 'пятницу', 'субботу'] as const;
 const DAY_FULL = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'] as const;
+
+const PLAN_TABS = [
+  { value: 'lessons', label: 'Уроки' },
+  { value: 'deadlines', label: 'Дедлайны' },
+  { value: 'focus', label: 'Фокус' },
+] as const satisfies readonly { value: PlanTab; label: string }[];
 
 const PARITIES = [
   { value: 'even', label: 'Чётная' },
@@ -29,6 +36,8 @@ export function ScheduleSection({ wide }: SectionProps) {
   const setDay = useUi((s) => s.setScheduleDay);
   const storedParity = useUi((s) => s.scheduleParity);
   const setParity = useUi((s) => s.setScheduleParity);
+  const planTab = useUi((s) => s.planTab);
+  const setPlanTab = useUi((s) => s.setPlanTab);
   const [editor, setEditor] = useState<{ lesson?: Lesson | undefined } | null>(null);
   const [copyOpen, setCopyOpen] = useState(false);
 
@@ -138,7 +147,25 @@ export function ScheduleSection({ wide }: SectionProps) {
 
   return (
     <div className={styles.section}>
-      <Columns wide={wide} main={lessonsBlock} side={<DeadlinesBlock subjects={subjects} />} />
+      {wide ? (
+        <Columns
+          wide
+          main={lessonsBlock}
+          side={
+            <>
+              <DeadlinesBlock subjects={subjects} />
+              <FocusBlock subjects={subjects} />
+            </>
+          }
+        />
+      ) : (
+        <>
+          <Segmented label="Раздел плана" options={PLAN_TABS} value={planTab} onChange={setPlanTab} block />
+          <div key={planTab} className={styles.tabBody}>
+            {planTab === 'lessons' ? lessonsBlock : planTab === 'deadlines' ? <DeadlinesBlock subjects={subjects} /> : <FocusBlock subjects={subjects} />}
+          </div>
+        </>
+      )}
 
       <LessonDialog
         open={editor !== null}

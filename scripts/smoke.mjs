@@ -87,6 +87,7 @@ try {
   await expectVisible(page.getByText('305'), 'lesson room');
 
   step = 'schedule: deadline';
+  await page.getByRole('button', { name: 'Дедлайны', exact: true }).click();
   await page.getByRole('button', { name: 'Добавить +' }).click();
   await dialog.getByLabel('Задача').fill('Реферат');
   await dialog.getByRole('button', { name: 'Сохранить' }).click();
@@ -131,6 +132,23 @@ try {
   await expectVisible(page.getByText(/Dogecoin · DOGE \/ USD/), 'DOGE selected');
 
   await context.close();
+
+  step = 'focus timer: 25 minutes, then a break';
+  const timed = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await mockCoinGecko(timed);
+  const tp = await timed.newPage();
+  tp.on('pageerror', (e) => errors.push(e.message));
+  await tp.clock.install();
+  await tp.goto(`${base}#/schedule`);
+  await tp.getByRole('button', { name: 'Фокус', exact: true }).click();
+  await tp.getByRole('button', { name: 'Старт 25 мин' }).click();
+  await expectVisible(tp.getByRole('link', { name: 'Открыть фокус-таймер' }), 'header indicator');
+  await tp.clock.runFor('25:02');
+  await expectVisible(tp.getByText('Перерыв · 5 мин'), 'break phase');
+  await expectVisible(tp.getByText('25 мин', { exact: true }), 'week minutes');
+  await tp.clock.runFor('05:02');
+  await expectVisible(tp.getByText('Готов к старту'), 'back to idle');
+  await timed.close();
 
   step = 'desktop: sections open full screen';
   const desk = await browser.newContext({ viewport: { width: 1440, height: 900 }, serviceWorkers: 'block' });

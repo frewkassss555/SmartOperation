@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { TrackerDb } from './db';
 
 describe('schema migrations', () => {
-  it('upgrades a v1 database to v2 without losing data', async () => {
+  it('upgrades a v1 database to the current version without losing data', async () => {
     const legacy = new Dexie('migration-v1');
     legacy.version(1).stores({
       subjects: 'id',
@@ -25,11 +25,12 @@ describe('schema migrations', () => {
 
     const db = new TrackerDb('migration-v1');
     await db.open();
-    expect(db.verno).toBe(2);
+    expect(db.verno).toBe(3);
     expect(await db.subjects.get('s1')).toEqual({ id: 's1', name: 'Физика', archived: false });
     expect(await db.watch.get('bitcoin')).toMatchObject({ symbol: 'BTC', name: 'Bitcoin' });
     expect(await db.watch.get('dogecoin')).toEqual({ coinId: 'dogecoin', order: 1 });
     expect(await db.quotes.count()).toBe(0);
+    expect(await db.focus.count()).toBe(0);
     db.close();
   });
 });

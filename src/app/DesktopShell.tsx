@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Delta, Panel, Stat } from '../design';
+import { FocusIndicator } from '../features/focus/FocusIndicator';
 import { coinLabel, useSelectedCoin } from '../features/market/coins';
 import { useOverview } from '../features/overview/useOverview';
 import { formatUsd } from '../lib/market';
@@ -109,6 +110,7 @@ export function DesktopShell({ route }: { route: Route }) {
             )}
           </span>
           <span className={styles.headerMeta}>
+            <FocusIndicator />
             <span>Неделя {isoWeek(today)}</span>
             <span>{formatHeaderDate(today)}</span>
           </span>

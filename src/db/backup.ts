@@ -56,7 +56,8 @@ export function parseBackup(text: string): { ok: true; backup: Backup } | { ok: 
     tables[name] = rows;
   }
 
-  // v1 → v2 only added cache tables, which are not exported: v1 files load as they are.
+  // v1 → v2 only added cache tables (not exported); v3 added the focus table, which older
+  // files simply lack (read as empty). So v1 and v2 files load as they are.
   // Later migrations of exported tables go here, step by step.
   return { ok: true, backup: { app: 'tracker', version: SCHEMA_VERSION, exportedAt: String(data.exportedAt ?? ''), tables } };
 }

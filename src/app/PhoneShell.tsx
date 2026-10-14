@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { FocusIndicator } from '../features/focus/FocusIndicator';
+import { useTimer } from '../features/focus/timer';
 import { formatHeaderDate, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
 import { useToday } from './hooks';
@@ -12,6 +14,8 @@ export function PhoneShell({ route }: { route: Route }) {
   const View = SECTION_VIEWS[route];
   const section = SECTIONS.find((s) => s.id === route);
   const dayTitle = overviewTitle(today);
+  // While the focus timer runs it takes the date's place: the header stays one line at 320px.
+  const focusRunning = useTimer((s) => s.phase !== 'idle');
 
   // Each screen starts at the top.
   useEffect(() => {
@@ -30,9 +34,13 @@ export function PhoneShell({ route }: { route: Route }) {
           <Brand />
         </a>
         <div className={styles.headerRight}>
-          <time className={styles.date} dateTime={toIsoDate(today)}>
-            {formatHeaderDate(today)}
-          </time>
+          {focusRunning ? (
+            <FocusIndicator />
+          ) : (
+            <time className={styles.date} dateTime={toIsoDate(today)}>
+              {formatHeaderDate(today)}
+            </time>
+          )}
           <a href={routeHref('settings')} className={styles.settings} aria-current={route === 'settings' ? 'page' : undefined}>
             Настр.
           </a>
