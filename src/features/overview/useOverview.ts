@@ -7,6 +7,8 @@ import { lessonsForDay, lessonStatus, parityOf } from '../../lib/schedule';
 import { useTxns } from '../finance/data';
 import { useGradesData } from '../grades/data';
 import { useLessons, useSubjects } from '../schedule/data';
+import { useTasks } from '../tasks/data';
+import { daysUntil, upcoming } from '../../lib/tasks';
 
 /** Numbers shared by the desktop header strip and the phone overview screen. */
 export function useOverview() {
@@ -16,6 +18,7 @@ export function useOverview() {
   const txns = useTxns() ?? [];
   const lessons = useLessons() ?? [];
   const subjects = useSubjects();
+  const tasks = useTasks() ?? [];
 
   const dayIndex = mondayIndex(now);
   const today = dayIndex === 6 ? [] : lessonsForDay(lessons, dayIndex, settings.weekParity ? parityOf(now) : null);
@@ -29,5 +32,6 @@ export function useOverview() {
     status,
     subjectName: (id: string) => subjects.find((s) => s.id === id)?.name ?? 'Без предмета',
     demo: settings.demo,
+    deadlines: upcoming(tasks, 3).map((t) => ({ ...t, days: daysUntil(t.due, now) })),
   };
 }

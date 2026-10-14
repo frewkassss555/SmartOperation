@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNow } from '../../app/hooks';
 import { useUi } from '../../app/uiStore';
-import { Button, Dialog, EmptyState, Segmented } from '../../design';
+import { Button, Columns, Dialog, EmptyState, Segmented } from '../../design';
 import { useSettings } from '../../db/settings';
 import type { Lesson } from '../../db/types';
 import { defaultSchoolDay, schoolWeek, SCHOOL_DAYS, toIsoDate } from '../../lib/date';
 import { formatDuration, lessonsForDay, lessonStatus, parityOf, type Parity } from '../../lib/schedule';
+import { DeadlinesBlock } from '../tasks/DeadlinesBlock';
 import type { SectionProps } from '../types';
 import { copyDay, useLessons, useSubjects } from './data';
 import { LessonDialog } from './LessonDialog';
@@ -19,7 +20,7 @@ const PARITIES = [
   { value: 'odd', label: 'Нечётная' },
 ] as const satisfies readonly { value: Parity; label: string }[];
 
-export function ScheduleSection(_: SectionProps) {
+export function ScheduleSection({ wide }: SectionProps) {
   const now = useNow();
   const settings = useSettings();
   const lessons = useLessons();
@@ -43,8 +44,8 @@ export function ScheduleSection(_: SectionProps) {
   const status = isToday ? lessonStatus(dayLessons, now.getHours() * 60 + now.getMinutes()) : null;
   const subjectName = (id: string) => subjects.find((s) => s.id === id)?.name ?? 'Без предмета';
 
-  return (
-    <div className={styles.section}>
+  const lessonsBlock = (
+    <>
       <div className={styles.strip} role="group" aria-label="День недели">
         {week.map((date, i) => {
           const isSelected = i === selected;
@@ -132,6 +133,12 @@ export function ScheduleSection(_: SectionProps) {
           </Button>
         </div>
       )}
+    </>
+  );
+
+  return (
+    <div className={styles.section}>
+      <Columns wide={wide} main={lessonsBlock} side={<DeadlinesBlock subjects={subjects} />} />
 
       <LessonDialog
         open={editor !== null}

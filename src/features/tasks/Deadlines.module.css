@@ -1,0 +1,112 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.muted {
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}
+
+.list {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+.task {
+  display: grid;
+  grid-template-columns: var(--tap) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 56px;
+  border-bottom: var(--rule) solid var(--line);
+}
+
+/* Overdue: red edge, red countdown with the word "Просрочено". */
+.overdue {
+  box-sizing: border-box;
+  border-left: var(--rule-strong) solid var(--negative);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: var(--tap);
+  justify-content: center;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.body:hover .title {
+  color: var(--accent);
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-body);
+  transition: color var(--dur) var(--ease);
+}
+
+.doneTitle {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.meta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.countdown {
+  padding-right: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.overdue .countdown {
+  color: var(--negative);
+}
+
+.toggle {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}

@@ -1,7 +1,9 @@
 import { routeHref } from '../../app/routes';
 import { Delta, Stat } from '../../design';
 import { formatUsd } from '../../lib/market';
+import { formatDayMonth } from '../../lib/date';
 import { formatDuration } from '../../lib/schedule';
+import { deadlineLabel } from '../../lib/tasks';
 import { coinLabel, useSelectedCoin } from '../market/coins';
 import type { SectionProps } from '../types';
 import styles from './Overview.module.css';
@@ -28,6 +30,27 @@ export function OverviewSection(_: SectionProps) {
           <Stat label={`${coinLabel(coin.watch)} / USD`} value={formatUsd(coin.quote?.price)} size="sm" hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />} />
         </a>
       </div>
+
+      <section aria-labelledby="overview-deadlines">
+        <h2 className={styles.heading} id="overview-deadlines">
+          Дедлайны
+        </h2>
+        {o.deadlines.length === 0 ? (
+          <p className={styles.muted}>Ближайших дедлайнов нет.</p>
+        ) : (
+          <ul className={styles.lessons}>
+            {o.deadlines.map((t) => (
+              <li key={t.id} className={t.days < 0 ? `${styles.lesson} ${styles.overdue}` : styles.lesson}>
+                <span className={styles.time}>{formatDayMonth(t.due)}</span>
+                <a href={routeHref('schedule')} className={styles.taskTitle}>
+                  {t.title}
+                </a>
+                <span className={styles.countdown}>{deadlineLabel(t.days)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section aria-labelledby="overview-today">
         <h2 className={styles.heading} id="overview-today">

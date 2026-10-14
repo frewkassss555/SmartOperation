@@ -80,7 +80,15 @@ export type ChartCache = {
   updatedAt: number;
 };
 
-export type Task = { id: string; title: string; due: string; subjectId?: string; done: boolean };
+export type Task = {
+  id: string;
+  title: string;
+  due: string;
+  subjectId?: string | undefined;
+  done: boolean;
+  /** When it was marked done (epoch ms): feeds the weekly summary. */
+  doneAt?: number | undefined;
+};
 
 export type Settings = {
   id: 'app';

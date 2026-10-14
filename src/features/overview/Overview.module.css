@@ -80,3 +80,24 @@
   font-size: 12px;
   text-transform: uppercase;
 }
+
+.taskTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-body);
+}
+
+.taskTitle:hover {
+  color: var(--accent);
+}
+
+.overdue .time,
+.overdue .countdown {
+  color: var(--negative);
+}
+
+.overdue {
+  border-left: var(--rule-strong) solid var(--negative);
+  padding-left: 8px;
+}

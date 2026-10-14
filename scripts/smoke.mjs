@@ -86,6 +86,19 @@ try {
   await dialog.getByRole('button', { name: 'Сохранить' }).click();
   await expectVisible(page.getByText('305'), 'lesson room');
 
+  step = 'schedule: deadline';
+  await page.getByRole('button', { name: 'Добавить +' }).click();
+  await dialog.getByLabel('Задача').fill('Реферат');
+  await dialog.getByRole('button', { name: 'Сохранить' }).click();
+  await expectVisible(page.getByText('Через 7 дней'), 'deadline countdown');
+  // The checked task moves to the collapsed "done" list, so click rather than check().
+  await page.getByRole('checkbox', { name: 'Выполнено: Реферат' }).click();
+  await expectVisible(page.getByText('Выполнено · 1'), 'done counter');
+  await undo.click();
+  await expectVisible(page.getByText('Через 7 дней'), 'deadline back after undo');
+  await page.getByRole('checkbox', { name: 'Выполнено: Реферат' }).click();
+  await expectVisible(page.getByText('Выполнено · 1'), 'done again');
+
   step = 'persistence after reload';
   await page.reload();
   await page.goto(`${base}#/notes`);
