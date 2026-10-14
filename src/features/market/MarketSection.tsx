@@ -10,6 +10,7 @@ import { coinLabel, useSelectedCoin } from './coins';
 import styles from './MarketSection.module.css';
 import { useMarketStatus, useWatchList } from './sync';
 import { CoinDialog } from './CoinDialog';
+import { PortfolioBlock } from './PortfolioBlock';
 import { WatchDialog } from './WatchDialog';
 
 const PERIODS = [
@@ -150,6 +151,9 @@ export function MarketSection({ compact, wide }: SectionProps) {
       <Button variant="secondary" onClick={() => setEditing(true)}>
         Изменить список
       </Button>
+
+      {/* The overview panel stays short; the portfolio lives in the full section. */}
+      {(compact || wide) && <PortfolioBlock list={list} quotes={quotes} />}
     </>
   );
 

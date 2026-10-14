@@ -155,7 +155,7 @@ export async function addDemoData(today = new Date()): Promise<void> {
     }
   }
 
-  await db.transaction('rw', [db.subjects, db.grades, db.lessons, db.txns, db.notes, db.tasks, db.focus, db.settings], async () => {
+  await db.transaction('rw', [db.subjects, db.grades, db.lessons, db.txns, db.notes, db.tasks, db.focus, db.watch, db.settings], async () => {
     await db.subjects.bulkAdd(subjects);
     await db.grades.bulkAdd(grades);
     await db.lessons.bulkAdd(lessons);
@@ -163,6 +163,11 @@ export async function addDemoData(today = new Date()): Promise<void> {
     await db.notes.bulkAdd(notes);
     await db.tasks.bulkAdd(tasks);
     await db.focus.bulkAdd(focus);
+    // A small notional portfolio, unless the user already filled one.
+    if (!(await db.watch.toArray()).some((w) => w.holding)) {
+      await db.watch.update('bitcoin', { holding: 0.02, buyPrice: 64000 });
+      await db.watch.update('ethereum', { holding: 0.5, buyPrice: 3900 });
+    }
     await updateSettings({
       demo: true,
       // Keep the user's own limits and goal if they already set them.

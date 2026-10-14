@@ -145,6 +145,14 @@ try {
   await expectVisible(page.getByText(/^DOGE выше \$0,1000/), 'in-app alert bar');
   await expectVisible(page.getByText('Выше $0,1000'), 'alert chip in the list');
 
+  step = 'market: notional portfolio';
+  await page.getByRole('button', { name: 'Заполнить' }).click();
+  await dialog.getByLabel('Количество').first().fill('0,5');
+  await dialog.getByLabel('Цена покупки, $').first().fill('60000');
+  await dialog.getByRole('button', { name: 'Сохранить' }).click();
+  await expectVisible(page.getByText('$40\u00a0900', { exact: true }), 'portfolio value');
+  await expectVisible(page.getByText('+$10\u00a0900'), 'portfolio result');
+
   await context.close();
 
   step = 'focus timer: 25 minutes, then a break';

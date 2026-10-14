@@ -77,6 +77,9 @@ export type Watch = {
   alertBelow?: number | undefined;
   firedAbove?: boolean | undefined;
   firedBelow?: boolean | undefined;
+  /** Notional portfolio: coins held and USD paid per coin. No real trades, no exchange keys. */
+  holding?: number | undefined;
+  buyPrice?: number | undefined;
 };
 
 /** Cache: last known quote of a coin (schema v2). */
