@@ -1,0 +1,60 @@
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sm {
+  font-size: 13px;
+}
+
+.md {
+  font-size: 16px;
+}
+
+.marker {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+}
+
+.md .marker {
+  width: 10px;
+  height: 10px;
+}
+
+.up {
+  color: var(--accent);
+}
+
+.up .marker {
+  background: var(--accent);
+}
+
+.down {
+  color: var(--negative);
+}
+
+.down .marker {
+  border: var(--rule-strong) solid var(--negative);
+}
+
+.flat {
+  color: var(--muted);
+}
+
+.flat .marker {
+  height: 2px;
+  background: var(--muted);
+}
+
+.suffix {
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}

@@ -1,3 +1,4 @@
+import { useMarketSync } from '../features/market/sync';
 import { DESKTOP_QUERY, useMediaQuery } from './hooks';
 import { DesktopShell } from './DesktopShell';
 import { PhoneShell } from './PhoneShell';
@@ -8,6 +9,8 @@ import { UndoBar } from './UndoBar';
 export function Shell() {
   const route = useRoute();
   const desktop = useMediaQuery(DESKTOP_QUERY);
+  // Quotes are the only network traffic: refreshed while the app is open and visible.
+  useMarketSync();
   return (
     <>
       {desktop ? <DesktopShell route={route} /> : <PhoneShell route={route} />}

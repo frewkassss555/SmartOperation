@@ -6,6 +6,7 @@ import { addDemoData } from '../../db/demo';
 import { updateSettings, useSettings } from '../../db/settings';
 import type { GradeScale } from '../../lib/grades';
 import { formatMinor, minorToInput, parseSignedMoney } from '../../lib/money';
+import { isIos, promptInstall, usePwa } from '../../pwa/pwa';
 import type { SectionProps } from '../types';
 import styles from './Settings.module.css';
 
@@ -28,6 +29,37 @@ function Group({ title, children }: { title: string; children: ReactNode }) {
       <h2 className={styles.groupTitle}>{title}</h2>
       {children}
     </section>
+  );
+}
+
+/** Install button when the browser offers it, a hint for iOS, or the installed state. */
+function InstallBlock() {
+  const installEvent = usePwa((s) => s.installEvent);
+  const installed = usePwa((s) => s.installed);
+
+  if (installed) return <p className={styles.note}>Приложение установлено и работает без сети.</p>;
+  if (installEvent) {
+    return (
+      <div className={styles.buttons}>
+        <Button variant="primary" onClick={promptInstall}>
+          Установить
+        </Button>
+        <p className={styles.note}>Трекер откроется отдельным окном и будет работать без сети.</p>
+      </div>
+    );
+  }
+  if (isIos()) {
+    return (
+      <p className={styles.note}>
+        Чтобы установить на iPhone или iPad: откройте Трекер в Safari, нажмите «Поделиться», затем «На экран „Домой“».
+      </p>
+    );
+  }
+  return (
+    <p className={styles.note}>
+      Установить можно из меню браузера (Chrome, Edge, Яндекс Браузер): «Установить приложение». После первой загрузки Трекер
+      работает и без сети.
+    </p>
   );
 }
 
@@ -177,6 +209,10 @@ export function SettingsSection(_: SectionProps) {
             onChange={(v) => void updateSettings({ weekParity: v === 'on' })}
           />
         </div>
+      </Group>
+
+      <Group title="Приложение">
+        <InstallBlock />
       </Group>
 
       <Group title="Данные">

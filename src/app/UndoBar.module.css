@@ -4,6 +4,9 @@
   left: var(--gutter);
   right: var(--gutter);
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   pointer-events: none;
 }
 

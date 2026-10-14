@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "screenshots": "node scripts/screenshots.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "icons": "node scripts/icons.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
@@ -20,6 +21,7 @@
     "dexie-react-hooks": "^4.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "workbox-window": "^7.4.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
@@ -30,6 +32,7 @@
     "playwright": "^1.64.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.4",
+    "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.4"
   }
 }

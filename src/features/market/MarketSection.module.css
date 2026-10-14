@@ -26,11 +26,6 @@
   line-height: 1;
 }
 
-.change {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--muted);
-}
 
 .chart {
   position: relative;
@@ -127,7 +122,66 @@
 
 .coinChange {
   min-width: 64px;
+}
+
+/* Narrow phones: the ticker is enough, the full name gives way to price and change. */
+@media (max-width: 420px) {
+  .coin {
+    grid-template-columns: 48px minmax(0, 1fr) auto;
+  }
+
+  .coin .coinName {
+    display: none;
+  }
+}
+
+.status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+}
+
+.warn {
+  color: var(--negative);
+}
+
+/* Watch list dialog */
+
+.watchList {
+  border-top: var(--rule) solid var(--line);
+}
+
+.watchRow {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  border-bottom: var(--rule) solid var(--line);
+}
+
+.watchTools {
+  display: flex;
+}
+
+.tool {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 0;
+  background: transparent;
   color: var(--muted);
+}
+
+.tool:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.tool:disabled {
+  cursor: default;
+  opacity: 0.35;
 }
 
 /* The selected row also gets a lime edge, so selection never relies on the background alone. */

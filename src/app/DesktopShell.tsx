@@ -1,14 +1,14 @@
 import { useEffect, useRef, type MouseEvent } from 'react';
-import { Panel, Stat } from '../design';
-import { coinById } from '../features/market/coins';
+import { Delta, Panel, Stat } from '../design';
+import { coinLabel, useSelectedCoin } from '../features/market/coins';
 import { useOverview } from '../features/overview/useOverview';
 import { SettingsSection } from '../features/settings/SettingsSection';
+import { formatUsd } from '../lib/market';
 import { formatFullDate, formatHeaderDate, isoWeek, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
 import { useToday } from './hooks';
 import { routeHref, SECTIONS, type Route, type Section, type SectionId } from './routes';
 import { SECTION_VIEWS } from './sectionViews';
-import { useUi } from './uiStore';
 import styles from './DesktopShell.module.css';
 
 /** Panel rows of the overview, as in the approved layout. */
@@ -32,7 +32,7 @@ function jumpTo(id: SectionId) {
 
 export function DesktopShell({ route }: { route: Route }) {
   const today = useToday();
-  const coin = coinById(useUi((s) => s.coin));
+  const coin = useSelectedCoin();
   const overview = useOverview();
   const title = overviewTitle(today);
   const isSettings = route === 'settings';
@@ -157,7 +157,7 @@ export function DesktopShell({ route }: { route: Route }) {
                         : undefined
                     }
                   />
-                  <Stat className={styles.stat} label={`${coin.symbol} / USD`} value="—" />
+                  <Stat className={styles.stat} label={`${coinLabel(coin.watch)} / USD`} value={formatUsd(coin.quote?.price)} hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />} />
                 </div>
 
                 <div className={styles.rows}>

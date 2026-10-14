@@ -1,8 +1,14 @@
+import { useLiveQuery } from 'dexie-react-hooks';
+import { useState } from 'react';
 import { useUi, type MarketPeriod } from '../../app/uiStore';
-import { Segmented, Stat } from '../../design';
+import { Button, Delta, LineChart, Segmented, Stat } from '../../design';
+import { db } from '../../db/db';
+import { formatClock, formatUsd, periodChange, priceRange, trendOf } from '../../lib/market';
 import type { SectionProps } from '../types';
-import { coinById, DEFAULT_COINS } from './coins';
+import { coinLabel, useSelectedCoin } from './coins';
 import styles from './MarketSection.module.css';
+import { useMarketStatus, useWatchList } from './sync';
+import { WatchDialog } from './WatchDialog';
 
 const PERIODS = [
   { value: '1', label: '1Д' },
@@ -15,68 +21,110 @@ const GRID_LINES = 4;
 export function MarketSection({ compact }: SectionProps) {
   const period = useUi((s) => s.marketPeriod);
   const setPeriod = useUi((s) => s.setMarketPeriod);
-  const coinId = useUi((s) => s.coin);
   const setCoin = useUi((s) => s.setCoin);
-  const coin = coinById(coinId);
+  const status = useMarketStatus();
+  const { watch, quote } = useSelectedCoin();
+  const list = useWatchList() ?? [];
+  const quotes = useLiveQuery(() => db.quotes.toArray(), []) ?? [];
+  const chart = useLiveQuery(() => db.charts.get(`${watch.coinId}:${period}`), [watch.coinId, period]);
+  const [editing, setEditing] = useState(false);
 
+  const points = chart?.points ?? [];
+  const change = periodChange(points);
+  const range = priceRange(points);
+  const trend = trendOf(change);
   const width = compact ? 350 : 760;
   const height = compact ? 180 : 280;
+  const periodLabel = PERIODS.find((p) => p.value === period)!.label;
+  const quoteOf = (id: string) => quotes.find((q) => q.coinId === id);
+  const updatedAt = Math.max(0, ...quotes.map((q) => q.updatedAt));
+
+  const statusText =
+    status.state === 'offline'
+      ? 'Нет сети · сохранённые цены'
+      : status.state === 'limited'
+        ? `Лимит запросов · пауза до ${formatClock(status.pausedUntil)}`
+        : status.state === 'error'
+          ? 'Ошибка обновления · сохранённые цены'
+          : status.state === 'loading' && !updatedAt
+            ? 'Загрузка…'
+            : null;
 
   return (
     <div className={styles.section}>
       <div className={styles.head}>
         <div className={styles.quote}>
           <span className="label">
-            {coin.name} · {coin.symbol} / USD
+            {watch.name ?? watch.coinId} · {coinLabel(watch)} / USD
           </span>
-          <span className={styles.price}>—</span>
-          <span className={styles.change}>Изменение: нет данных</span>
+          <span className={styles.price}>{formatUsd(quote?.price)}</span>
+          <Delta value={change} suffix={`за ${periodLabel}`} size="md" />
         </div>
         <Segmented label="Период графика" options={PERIODS} value={period} onChange={setPeriod} />
       </div>
 
       <figure className={styles.chart}>
-        <svg
-          viewBox={`0 0 ${width} ${height}`}
-          width="100%"
-          role="img"
-          aria-label={`График ${coin.symbol}: нет данных`}
-          preserveAspectRatio="none"
-          style={{ aspectRatio: `${width} / ${height}` }}
-        >
-          {Array.from({ length: GRID_LINES }, (_, i) => {
-            const y = Math.round(((i + 0.5) * height) / GRID_LINES) + 0.5;
-            return <line key={i} x1={0} x2={width} y1={y} y2={y} className={styles.grid} />;
-          })}
-        </svg>
-        <figcaption className={styles.noData}>Нет данных</figcaption>
+        {points.length > 1 ? (
+          <LineChart
+            values={points.map((p) => p[1])}
+            width={width}
+            height={height}
+            gridLines={GRID_LINES}
+            tone={trend === 'up' ? 'accent' : trend === 'down' ? 'negative' : 'text'}
+            label={`${coinLabel(watch)} за ${periodLabel}: от ${formatUsd(points[0]![1])} до ${formatUsd(points.at(-1)![1])}`}
+          />
+        ) : (
+          <>
+            <svg viewBox={`0 0 ${width} ${height}`} width="100%" preserveAspectRatio="none" style={{ aspectRatio: `${width} / ${height}` }} aria-hidden="true">
+              {Array.from({ length: GRID_LINES }, (_, i) => {
+                const y = Math.round(((i + 0.5) * height) / GRID_LINES) + 0.5;
+                return <line key={i} x1={0} x2={width} y1={y} y2={y} className={styles.grid} />;
+              })}
+            </svg>
+            <figcaption className={styles.noData}>{status.state === 'loading' || status.state === 'idle' ? 'Загрузка…' : 'Нет данных'}</figcaption>
+          </>
+        )}
       </figure>
 
       <div className={styles.range}>
-        <Stat className={styles.rangeCell} label="Макс. за период" value="—" />
-        <Stat className={styles.rangeCell} label="Мин. за период" value="—" />
+        <Stat className={styles.rangeCell} label={`Макс. за ${periodLabel}`} value={formatUsd(range?.max)} />
+        <Stat className={styles.rangeCell} label={`Мин. за ${periodLabel}`} value={formatUsd(range?.min)} />
+      </div>
+
+      <div className={styles.status} role="status">
+        <span className="label">{updatedAt ? `Обновлено ${formatClock(updatedAt)}` : 'Ещё не обновлялось'}</span>
+        {statusText && <span className={`label ${styles.warn}`}>{statusText}</span>}
       </div>
 
       <ul className={styles.coins} aria-label="Наблюдаемые монеты">
-        {DEFAULT_COINS.map((c) => {
-          const selected = c.id === coin.id;
+        {list.map((w) => {
+          const q = quoteOf(w.coinId);
+          const selected = w.coinId === watch.coinId;
           return (
-            <li key={c.id}>
+            <li key={w.coinId}>
               <button
                 type="button"
                 aria-pressed={selected}
                 className={selected ? `${styles.coin} ${styles.selected}` : styles.coin}
-                onClick={() => setCoin(c.id)}
+                onClick={() => setCoin(w.coinId)}
               >
-                <span className={styles.symbol}>{c.symbol}</span>
-                <span className={styles.coinName}>{c.name}</span>
-                <span className={styles.coinPrice}>—</span>
-                <span className={styles.coinChange}>— 24Ч</span>
+                <span className={styles.symbol}>{coinLabel(w)}</span>
+                <span className={styles.coinName}>{w.name ?? w.coinId}</span>
+                <span className={styles.coinPrice}>{formatUsd(q?.price)}</span>
+                <span className={styles.coinChange}>
+                  <Delta value={q?.change24h} suffix="24Ч" />
+                </span>
               </button>
             </li>
           );
         })}
       </ul>
+
+      <Button variant="secondary" onClick={() => setEditing(true)}>
+        Изменить список
+      </Button>
+
+      <WatchDialog open={editing} onClose={() => setEditing(false)} list={list} />
     </div>
   );
 }

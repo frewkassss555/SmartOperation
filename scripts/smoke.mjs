@@ -2,6 +2,7 @@
 // persistence across reload, delete-all. Run `npm run build` first.
 import { chromium } from 'playwright';
 import { preview } from 'vite';
+import { mockCoinGecko } from './mockMarket.mjs';
 
 const PORT = 4319;
 const base = `http://127.0.0.1:${PORT}/`;
@@ -26,7 +27,8 @@ const expectGone = async (locator, what) => {
 };
 
 try {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  await mockCoinGecko(context);
   const page = await context.newPage();
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
@@ -101,13 +103,62 @@ try {
   await page.goto(`${base}#/grades`);
   await expectVisible(page.getByText('Предметов пока нет'), 'empty grades');
 
+  step = 'market: quotes, period, watch list';
+  await page.goto(`${base}#/market`);
+  await expectVisible(page.getByText(/^\$81\u00a08\d\d$/), 'BTC price');
+  await expectVisible(page.getByText(/^Обновлено \d\d:\d\d$/), 'updated time');
+  await page.getByRole('button', { name: '30Д' }).click();
+  await expectVisible(page.getByText('Макс. за 30Д'), '30-day range');
+  await page.getByRole('button', { name: 'Изменить список' }).click();
+  await dialog.getByLabel('Добавить монету').fill('doge');
+  await dialog.getByRole('button', { name: 'Добавить', exact: true }).click();
+  await expectVisible(dialog.getByRole('button', { name: 'Убрать DOGE' }), 'DOGE in watch list');
+  await dialog.getByRole('button', { name: 'Готово' }).click();
+  await page.getByRole('button', { name: /^DOGE/ }).click();
+  await expectVisible(page.getByText(/Dogecoin · DOGE \/ USD/), 'DOGE selected');
+
   await context.close();
+
+  step = 'pwa: manifest and offline';
+  const offline = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await mockCoinGecko(offline);
+  const app = await offline.newPage();
+  app.on('pageerror', (e) => errors.push(e.message));
+  const manifest = await (await offline.request.get(`${base}manifest.webmanifest`)).json();
+  if (manifest.display !== 'standalone' || manifest.lang !== 'ru' || manifest.theme_color !== '#101110' || manifest.icons.length !== 3) {
+    throw new Error(`${step}: unexpected manifest ${JSON.stringify(manifest)}`);
+  }
+  await app.goto(`${base}#/market`);
+  await app.evaluate(() => navigator.serviceWorker.ready.then(() => undefined));
+  await app.reload();
+  await app.waitForFunction(() => navigator.serviceWorker.controller !== null);
+  await expectVisible(app.getByText(/^\$81\u00a08\d\d$/), 'price before going offline');
+  await offline.unrouteAll();
+  await offline.setOffline(true);
+  await app.reload();
+  await expectVisible(app.getByRole('heading', { name: 'Рынок' }), 'app shell offline');
+  await expectVisible(app.getByText(/^\$81\u00a08\d\d$/), 'saved price offline');
+  await expectVisible(app.getByText(/^Обновлено \d\d:\d\d$/), 'saved time offline');
+  await expectVisible(app.getByText(/Нет сети/), 'offline status');
+  for (const [route, text] of [
+    ['grades', 'Предметов пока нет'],
+    ['finance', 'Операций пока нет'],
+    ['schedule', /уроков нет/],
+    ['notes', 'Заметок пока нет'],
+  ]) {
+    await app.goto(`${base}#/${route}`);
+    await expectVisible(app.getByText(text), `${route} offline`);
+  }
+  await offline.close();
+
   console.log('Smoke test passed.');
 } catch (err) {
   console.error(err.message);
   process.exitCode = 1;
 } finally {
   await browser.close();
+  // Keep-alive connections would hold close() open; drop them first.
+  server.httpServer.closeAllConnections?.();
   await new Promise((resolve) => server.httpServer.close(resolve));
 }
 

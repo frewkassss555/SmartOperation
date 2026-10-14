@@ -49,6 +49,7 @@ describe('export and import', () => {
       ok: false,
     });
     expect(parseBackup('{"app":"tracker","version":1,"tables":{}}')).toMatchObject({ ok: true });
+    expect(parseBackup('{"app":"tracker","version":2,"tables":{}}')).toMatchObject({ ok: true });
   });
 
   it('creates recurring occurrences once', async () => {

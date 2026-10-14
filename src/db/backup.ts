@@ -56,7 +56,8 @@ export function parseBackup(text: string): { ok: true; backup: Backup } | { ok: 
     tables[name] = rows;
   }
 
-  // Older export versions would be migrated here, step by step, before returning.
+  // v1 → v2 only added cache tables, which are not exported: v1 files load as they are.
+  // Later migrations of exported tables go here, step by step.
   return { ok: true, backup: { app: 'tracker', version: SCHEMA_VERSION, exportedAt: String(data.exportedAt ?? ''), tables } };
 }
 
@@ -89,7 +90,10 @@ export async function importBackup(backup: Backup, mode: ImportMode): Promise<vo
   });
 }
 
-/** Deletes all user data and restores defaults. */
+/**
+ * Deletes all user data and restores defaults. Quote caches stay: they are public market
+ * data, and keeping them means prices show at once instead of after the next refresh.
+ */
 export async function deleteAllData(): Promise<void> {
   await db.transaction('rw', TABLES.map((name) => db.table(name)), async () => {
     const current = await db.settings.get('app');

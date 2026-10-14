@@ -6,8 +6,10 @@ import './design/base.css';
 import { normalizeHash } from './app/router';
 import { Shell } from './app/Shell';
 import { applyRecurring } from './db/recurring';
+import { setupPwa } from './pwa/pwa';
 
 normalizeHash();
+setupPwa();
 // Repeating transactions (subscriptions, travel) are created when the app opens.
 void applyRecurring();
 

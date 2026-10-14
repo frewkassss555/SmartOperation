@@ -8,3 +8,4 @@ export { Bar } from './components/Bar';
 export { EmptyState } from './components/EmptyState';
 export { Dialog } from './components/Dialog';
 export { LineChart } from './components/LineChart';
+export { Delta } from './components/Delta';

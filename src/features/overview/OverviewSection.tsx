@@ -1,8 +1,8 @@
 import { routeHref } from '../../app/routes';
-import { useUi } from '../../app/uiStore';
-import { Stat } from '../../design';
+import { Delta, Stat } from '../../design';
+import { formatUsd } from '../../lib/market';
 import { formatDuration } from '../../lib/schedule';
-import { coinById } from '../market/coins';
+import { coinLabel, useSelectedCoin } from '../market/coins';
 import type { SectionProps } from '../types';
 import styles from './Overview.module.css';
 import { useOverview } from './useOverview';
@@ -10,7 +10,7 @@ import { useOverview } from './useOverview';
 /** Phone overview: the four key numbers and today's lessons. */
 export function OverviewSection(_: SectionProps) {
   const o = useOverview();
-  const coin = coinById(useUi((s) => s.coin));
+  const coin = useSelectedCoin();
 
   return (
     <div className={styles.section}>
@@ -25,7 +25,7 @@ export function OverviewSection(_: SectionProps) {
           <Stat label="Уроков сегодня" value={o.lessonsToday} />
         </a>
         <a href={routeHref('market')} className={styles.cell}>
-          <Stat label={`${coin.symbol} / USD`} value="—" />
+          <Stat label={`${coinLabel(coin.watch)} / USD`} value={formatUsd(coin.quote?.price)} size="sm" hint={<Delta value={coin.quote?.change24h} suffix="24Ч" />} />
         </a>
       </div>
 

@@ -55,7 +55,30 @@ export type Note = {
   updatedAt: number;
 };
 
-export type Watch = { coinId: string; order: number };
+/** A watched coin. Symbol and name are kept so the list renders offline before any quote. */
+export type Watch = { coinId: string; order: number; symbol?: string | undefined; name?: string | undefined };
+
+/** Cache: last known quote of a coin (schema v2). */
+export type Quote = {
+  coinId: string;
+  symbol: string;
+  name: string;
+  price: number;
+  change24h: number | null;
+  /** When CoinGecko last updated the price (epoch ms). */
+  updatedAt: number;
+};
+
+/** Cache: downsampled price series for a coin and period (schema v2). */
+export type ChartCache = {
+  /** `${coinId}:${days}` */
+  key: string;
+  coinId: string;
+  days: number;
+  points: [number, number][];
+  /** Time of the newest point (epoch ms). */
+  updatedAt: number;
+};
 
 export type Task = { id: string; title: string; due: string; subjectId?: string; done: boolean };
 
@@ -86,7 +109,10 @@ export const DEFAULT_SETTINGS: Settings = {
 };
 
 export const DEFAULT_WATCH: Watch[] = [
-  { coinId: 'bitcoin', order: 0 },
-  { coinId: 'ethereum', order: 1 },
-  { coinId: 'solana', order: 2 },
+  { coinId: 'bitcoin', order: 0, symbol: 'BTC', name: 'Bitcoin' },
+  { coinId: 'ethereum', order: 1, symbol: 'ETH', name: 'Ethereum' },
+  { coinId: 'solana', order: 2, symbol: 'SOL', name: 'Solana' },
 ];
+
+/** Upper bound of the watch list. */
+export const MAX_WATCH = 10;

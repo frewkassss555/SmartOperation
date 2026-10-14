@@ -1,12 +1,12 @@
 # Tracker
 
-An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device in IndexedDB. The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
+An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device in IndexedDB. The only network request is for crypto quotes (CoinGecko). The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
 
-**Status:** stage 2 of 5. Grades, finances, schedule, notes, overview and settings work on local data. Market quotes and offline install come in stage 3.
+**Status:** stage 3 of 5. All five sections, overview and settings work. Quotes update every minute and stay visible offline. The app installs and works without a network.
 
 ## Requirements
 
-Node.js 20 or newer.
+Node.js 22.6 or newer (the check scripts import TypeScript directly).
 
 ## Scripts
 
@@ -14,36 +14,49 @@ Node.js 20 or newer.
 npm install
 npm run dev          # dev server at http://127.0.0.1:5173 (opens the browser)
 npm run typecheck    # TypeScript, strict
-npm test             # Vitest: calculations, export/import round-trip
-npm run build        # type check + production build into dist/
-npm run preview      # serve dist/
+npm test             # Vitest: calculations, API parsing, export/import, migrations
+npm run build        # type check + production build into dist/ (with the service worker)
+npm run preview      # serve dist/; install and offline mode only work here, not in dev
 npm run screenshots  # after build: 390×844 and 1440×900 screenshots into screenshots/
-npm run smoke        # after build: Playwright walk-through of add/edit/delete/undo
+npm run smoke        # after build: Playwright walk-through, including offline mode
+npm run icons        # re-render the PWA icons into public/icons
 ```
 
-`screenshots` and `smoke` need Playwright's Chromium once: `npx playwright install chromium`.
+`screenshots`, `smoke` and `icons` need Playwright's Chromium once: `npx playwright install chromium`.
 
 On Windows PowerShell with script execution disabled, use `npm.cmd` instead of `npm`.
+
+### Demo quotes
+
+`VITE_DEMO_MARKET=1 npm run dev` replaces CoinGecko with deterministic series from `src/lib/demoMarket.ts`. This is useful offline or when the public API rate-limits you. In PowerShell: `$env:VITE_DEMO_MARKET='1'; npm.cmd run dev`.
 
 ## Structure
 
 ```
 src/
-  app/        shell, navigation, hash router, UI state (Zustand), undo bar
+  app/        shell, navigation, hash router, UI state (Zustand), undo and update bars
   design/     tokens.css, base.css, fonts, components (Panel, Stat, Chip, Segmented, Button,
-              Field, Bar, EmptyState, Dialog, LineChart)
-  db/         Dexie schema, settings, export/import, demo data, recurring transactions
+              Field, Bar, EmptyState, Dialog, LineChart, Delta)
+  db/         Dexie schema and migrations, settings, export/import, demo data, recurring transactions
   features/   grades, finance, schedule, notes, market, overview, settings
-  lib/        pure calculations with tests: dates, money, grades, recurring, schedule, notes
-public/       static assets
-scripts/      screenshot and smoke checks
+  lib/        pure logic with tests: dates, money, grades, recurring, schedule, notes, market,
+              CoinGecko client
+  pwa/        service worker registration, install prompt
+public/       favicon and PWA icons
+scripts/      screenshot, smoke and icon scripts
 ```
 
 ## Data
 
 - Money is stored as integer minor units (kopecks); dates as `YYYY-MM-DD` strings.
-- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`); add a new `version(n)` block for migrations.
-- Export is one JSON file with all tables and a `version` field. Import validates it and offers replace or merge.
+- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`, currently 2) and migrations are tested.
+- Export is one JSON file with all user tables and a `version` field. Import validates it and offers replace or merge. Quote caches are not exported.
+
+## Offline and quotes
+
+- The service worker (Workbox via vite-plugin-pwa) precaches the whole shell: JS, CSS, fonts and icons.
+- CoinGecko requests are network-first with a 4-second timeout and fall back to the cache. Responses are also stored in IndexedDB. The UI shows the last saved prices with the time ("ОБНОВЛЕНО 14:20").
+- Quotes refresh every 60 seconds while the tab is visible. After a 429 the app waits 2, 4, 8 and at most 15 minutes before trying again.
 
 ## Design rules
 

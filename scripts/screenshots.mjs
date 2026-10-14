@@ -4,6 +4,7 @@
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 import { preview } from 'vite';
+import { mockCoinGecko } from './mockMarket.mjs';
 
 const OUT = 'screenshots';
 const ROUTES = ['overview', 'grades', 'finance', 'schedule', 'notes', 'market', 'settings'];
@@ -17,7 +18,9 @@ const problems = [];
 
 /** A browser context with its own IndexedDB; optionally filled with demo data. */
 async function session(width, height, withDemo) {
-  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
+  // Service workers are blocked so their 'offline ready' notice does not cover the screenshots.
+  const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, serviceWorkers: 'block' });
+  await mockCoinGecko(context);
   const page = await context.newPage();
   page.on('pageerror', (err) => problems.push(`@${width}: ${err.message}`));
   page.on('console', (msg) => msg.type() === 'error' && problems.push(`@${width}: ${msg.text()}`));
@@ -78,6 +81,8 @@ try {
   }
 } finally {
   await browser.close();
+  // Keep-alive connections would hold close() open; drop them first.
+  server.httpServer.closeAllConnections?.();
   await new Promise((resolve) => server.httpServer.close(resolve));
 }
 
