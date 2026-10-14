@@ -17,6 +17,19 @@ body,
   height: 100%;
 }
 
+/*
+ * Only the shell's content area scrolls, never the document. Without this, absolutely
+ * positioned hidden labels deep in a scrolled area made the document taller than the
+ * window, and the wheel then dragged the whole layout up.
+ */
+#root {
+  overflow: clip;
+}
+
+main {
+  position: relative;
+}
+
 body {
   margin: 0;
   background: var(--ground);

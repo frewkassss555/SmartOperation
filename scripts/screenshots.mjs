@@ -51,6 +51,10 @@ async function shoot(page, route, file, { scrollToBottom = false } = {}) {
     await page.evaluate(() => document.querySelector('main')?.scrollTo(0, 1e6));
     await page.waitForTimeout(100);
   }
+  // Only the content area may scroll: a scrollable document lets the wheel drag the whole
+  // layout (sidebar and header included) out of place.
+  const docOverflow = await page.evaluate(() => document.documentElement.scrollHeight - document.documentElement.clientHeight);
+  if (docOverflow > 0) problems.push(`${route} @${page.viewportSize().width}: document scrolls by ${docOverflow}px`);
   if (file) await page.screenshot({ path: `${OUT}/${file}` });
 }
 
