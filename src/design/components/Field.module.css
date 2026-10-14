@@ -39,6 +39,16 @@
   cursor: pointer;
 }
 
+:global(:root[data-theme='light']) .input::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :global(:root[data-theme='system']) .input::-webkit-calendar-picker-indicator {
+    filter: none;
+  }
+}
+
 .selectWrap {
   position: relative;
   display: block;

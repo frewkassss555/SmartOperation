@@ -11,6 +11,14 @@
     <meta name="apple-mobile-web-app-title" content="Трекер" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
     <title>Трекер</title>
+    <script>
+      // Apply the saved theme before the first paint (see src/app/theme.ts).
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem('tracker.theme') || 'dark';
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

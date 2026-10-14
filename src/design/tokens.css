@@ -54,3 +54,39 @@
     --gutter: 32px;
   }
 }
+
+/*
+ * Light theme: the tokens inverted (ground #ECE8DC, text #101110). Lime is unreadable on a
+ * light ground, so the accent is a dark olive with 6.4:1 contrast; text on it uses --ground.
+ * Applied by the setting (data-theme="light") or by the system when the setting is "system".
+ * Both blocks must stay identical; src/design/contrast.test.ts checks the ratios.
+ */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --ground: #ECE8DC;
+  --panel: #E1DDCF;
+  --line: #CFCAB9;
+  --line-strong: #9E9988;
+  --text: #101110;
+  --text-soft: #3A3D38;
+  --muted: #5C5F57;
+  --accent: #3D5A00;
+  --negative: #A62E17;
+  --scrim: rgb(236 232 220 / 0.86);
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-theme='system'] {
+    color-scheme: light;
+    --ground: #ECE8DC;
+    --panel: #E1DDCF;
+    --line: #CFCAB9;
+    --line-strong: #9E9988;
+    --text: #101110;
+    --text-soft: #3A3D38;
+    --muted: #5C5F57;
+    --accent: #3D5A00;
+    --negative: #A62E17;
+    --scrim: rgb(236 232 220 / 0.86);
+  }
+}

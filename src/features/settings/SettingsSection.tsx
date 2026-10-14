@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { setTheme, useTheme, type Theme } from '../../app/theme';
 import { notify } from '../../app/undo';
 import { Button, Dialog, Field, Segmented } from '../../design';
 import { backupFileName, deleteAllData, exportBackup, importBackup, parseBackup, type Backup, type ImportMode } from '../../db/backup';
@@ -16,6 +17,12 @@ const SCALES = [
   { value: '10', label: '1–10' },
   { value: '12', label: '1–12' },
 ] as const;
+
+const THEMES = [
+  { value: 'dark', label: 'Тёмная' },
+  { value: 'light', label: 'Светлая' },
+  { value: 'system', label: 'Система' },
+] as const satisfies readonly { value: Theme; label: string }[];
 
 const ON_OFF = [
   { value: 'off', label: 'Выкл' },
@@ -66,6 +73,7 @@ function InstallBlock() {
 
 export function SettingsSection(_: SectionProps) {
   const settings = useSettings();
+  const theme = useTheme((s) => s.theme);
   const [currency, setCurrency] = useState(settings.currency);
   const [start, setStart] = useState('');
   const [startError, setStartError] = useState<string | undefined>();
@@ -139,6 +147,13 @@ export function SettingsSection(_: SectionProps) {
 
   return (
     <div className={styles.section}>
+      <Group title="Оформление">
+        <div className={styles.row}>
+          <span className={styles.rowLabel}>Тема</span>
+          <Segmented label="Тема оформления" options={THEMES} value={theme} onChange={setTheme} />
+        </div>
+      </Group>
+
       <Group title="Оценки">
         <div className={styles.row}>
           <span className={styles.rowLabel}>Шкала оценок</span>

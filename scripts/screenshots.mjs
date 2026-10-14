@@ -17,10 +17,11 @@ const browser = await chromium.launch();
 const problems = [];
 
 /** A browser context with its own IndexedDB; optionally filled with demo data. */
-async function session(width, height, withDemo) {
+async function session(width, height, withDemo, theme = 'dark') {
   // Service workers are blocked so their 'offline ready' notice does not cover the screenshots.
   const context = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1, serviceWorkers: 'block' });
   await mockCoinGecko(context);
+  await context.addInitScript((t) => localStorage.setItem('tracker.theme', t), theme);
   const page = await context.newPage();
   page.on('pageerror', (err) => problems.push(`@${width}: ${err.message}`));
   page.on('console', (msg) => msg.type() === 'error' && problems.push(`@${width}: ${msg.text()}`));
@@ -77,6 +78,16 @@ try {
     for (const route of ROUTES) await shoot(desk.page, route, `${prefix}desktop-${route}.png`);
     await shoot(desk.page, 'overview', null);
     await shoot(desk.page, 'overview', `${prefix}desktop-overview-bottom.png`, { scrollToBottom: true });
+    await desk.context.close();
+  }
+
+  // Light theme with demo data: the main screens on both layouts.
+  {
+    const phone = await session(390, 844, true, 'light');
+    for (const route of ['overview', 'grades', 'finance', 'schedule', 'market']) await shoot(phone.page, route, `light-phone-${route}.png`);
+    await phone.context.close();
+    const desk = await session(1440, 900, true, 'light');
+    for (const route of ['overview', 'finance', 'market', 'notes']) await shoot(desk.page, route, `light-desktop-${route}.png`);
     await desk.context.close();
   }
 } finally {
