@@ -14,6 +14,16 @@ export function useMediaQuery(query: string): boolean {
   );
 }
 
+/** Current time, refreshed every `intervalMs` (for countdowns). */
+export function useNow(intervalMs = 30_000): Date {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), intervalMs);
+    return () => window.clearInterval(timer);
+  }, [intervalMs]);
+  return now;
+}
+
 /** The current date, refreshed once a minute so the UI rolls over at midnight. */
 export function useToday(): Date {
   const [today, setToday] = useState(() => new Date());

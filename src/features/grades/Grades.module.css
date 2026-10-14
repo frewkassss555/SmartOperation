@@ -1,0 +1,304 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Two-part block: big average on the left, two stacked cells on the right. */
+.summary {
+  display: flex;
+  border: var(--rule) solid var(--line-strong);
+}
+
+.average {
+  flex: 1 1 50%;
+  justify-content: space-between;
+  padding: 16px;
+  border-right: var(--rule) solid var(--line-strong);
+}
+
+.cells {
+  flex: 1 1 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cell {
+  flex: 1 1 0;
+  padding: 16px;
+}
+
+.cell + .cell {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+/* Subject list */
+
+.subjects {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+.subject {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 0 16px;
+  border-bottom: var(--rule) solid var(--line-strong);
+}
+
+.subjectHead {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.subjectName {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: 0 8px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.subjectName > span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subjectName:hover {
+  color: var(--accent);
+}
+
+.subjectName[aria-expanded='true'] {
+  color: var(--accent);
+}
+
+.subjectAvg {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.more {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--tap);
+  border: var(--rule) solid var(--line-strong);
+  background: transparent;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.more:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.quick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel);
+}
+
+.picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 4px;
+}
+
+.pick {
+  min-height: var(--tap);
+  border: var(--rule) solid var(--line-strong);
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 16px;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.pick:hover {
+  border-color: var(--text);
+}
+
+.pick:active,
+.pickOn,
+.pickOn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}
+
+.plates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Square grade plate; the latest one is filled with the accent. */
+.plate {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: var(--rule) solid var(--line-strong);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+button.plate {
+  position: relative;
+}
+
+/* 44px hit area around the 34px plate. */
+button.plate::after {
+  content: '';
+  position: absolute;
+  inset: -5px -2px;
+}
+
+button.plate:hover {
+  border-color: var(--text);
+}
+
+.plateLast {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}
+
+.muted {
+  font-size: var(--fs-body-sm);
+  color: var(--muted);
+}
+
+/* Archive */
+
+.archive {
+  border-top: var(--rule) solid var(--line);
+}
+
+.archiveToggle {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.archived {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0;
+  border: 0;
+  border-top: var(--rule) solid var(--line);
+  background: transparent;
+  color: var(--text-soft);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 16px;
+  text-transform: uppercase;
+  align-items: center;
+}
+
+.archived:hover {
+  color: var(--text);
+}
+
+.archivedAvg {
+  font-family: var(--font-mono);
+}
+
+/* Subject dialog */
+
+.detailStats {
+  display: flex;
+  gap: 32px;
+}
+
+.trend {
+  margin-top: 12px;
+}
+
+.gradeList {
+  border-top: var(--rule) solid var(--line);
+}
+
+.gradeRow {
+  display: grid;
+  grid-template-columns: 48px 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 4px;
+  border: 0;
+  border-bottom: var(--rule) solid var(--line);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.gradeRow:hover {
+  background: var(--panel);
+}
+
+.gradeRowDate,
+.gradeRowWeight {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gradeRowComment {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}
+
+/* Grade dialog */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.group > .picker {
+  align-self: stretch;
+}
+
+.error {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--negative);
+}

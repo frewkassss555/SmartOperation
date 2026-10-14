@@ -1,6 +1,7 @@
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { Panel, Stat } from '../design';
 import { coinById } from '../features/market/coins';
+import { useOverview } from '../features/overview/useOverview';
 import { SettingsSection } from '../features/settings/SettingsSection';
 import { formatFullDate, formatHeaderDate, isoWeek, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
@@ -16,7 +17,8 @@ const ROWS: readonly (readonly SectionId[])[] = [
   ['schedule', 'finance', 'notes'],
 ];
 
-const DEMO_NOTE = 'Демо-данные выключены. Их можно добавить в настройках.';
+const demoNote = (demo: boolean) =>
+  demo ? 'Добавлены демо-данные. Очистить: Настройки → Удалить всё.' : 'Демо-данные выключены. Их можно добавить в настройках.';
 
 const panelId = (id: SectionId) => `panel-${id}`;
 
@@ -31,15 +33,22 @@ function jumpTo(id: SectionId) {
 export function DesktopShell({ route }: { route: Route }) {
   const today = useToday();
   const coin = coinById(useUi((s) => s.coin));
+  const overview = useOverview();
   const title = overviewTitle(today);
   const isSettings = route === 'settings';
   const prevRoute = useRef(route);
 
+  const mainRef = useRef<HTMLElement>(null);
+
   // Navigation scrolls to the panel; the initial load keeps the overview header in view.
+  // Switching between the overview and settings starts at the top.
   useEffect(() => {
     if (prevRoute.current === route) return;
+    const fromSettings = prevRoute.current === 'settings';
     prevRoute.current = route;
-    if (route !== 'settings') jumpTo(route);
+    if (route === 'settings' || route === 'overview') mainRef.current?.scrollTo(0, 0);
+    else if (fromSettings) requestAnimationFrame(() => jumpTo(route));
+    else jumpTo(route);
   }, [route]);
 
   const onNavClick = (event: MouseEvent, id: SectionId) => {
@@ -69,9 +78,9 @@ export function DesktopShell({ route }: { route: Route }) {
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <div className={styles.brandRow}>
+        <a href={routeHref('overview')} className={styles.brandRow} aria-label="Трекер, обзор">
           <Brand />
-        </div>
+        </a>
         <nav aria-label="Разделы">
           {SECTIONS.map((s) => {
             const active = s.id === route;
@@ -91,7 +100,7 @@ export function DesktopShell({ route }: { route: Route }) {
         </nav>
         <div className={styles.sidebarFoot}>
           <a
-            href={isSettings ? routeHref('grades') : routeHref('settings')}
+            href={isSettings ? routeHref('overview') : routeHref('settings')}
             className={isSettings ? `${styles.navItem} ${styles.active}` : styles.navItem}
             aria-current={isSettings ? 'page' : undefined}
           >
@@ -103,7 +112,7 @@ export function DesktopShell({ route }: { route: Route }) {
             <time className={styles.metaDate} dateTime={toIsoDate(today)}>
               {formatFullDate(today)}
             </time>
-            <p className={styles.metaNote}>{DEMO_NOTE}</p>
+            <p className={styles.metaNote}>{demoNote(overview.demo)}</p>
           </div>
         </div>
       </aside>
@@ -120,7 +129,7 @@ export function DesktopShell({ route }: { route: Route }) {
           </span>
         </header>
 
-        <main className={styles.main}>
+        <main className={styles.main} ref={mainRef}>
           <div className={styles.content}>
             {isSettings ? (
               <>
@@ -136,9 +145,18 @@ export function DesktopShell({ route }: { route: Route }) {
                 </h1>
 
                 <div className={styles.stats}>
-                  <Stat className={styles.stat} label="Средний балл" value="—" tone="accent" />
-                  <Stat className={styles.stat} label="Баланс" value="0,00" />
-                  <Stat className={styles.stat} label="Уроков сегодня" value="0" />
+                  <Stat className={styles.stat} label="Средний балл" value={overview.average} tone="accent" />
+                  <Stat className={styles.stat} label="Баланс" value={overview.balance} />
+                  <Stat
+                    className={styles.stat}
+                    label="Уроков сегодня"
+                    value={overview.lessonsToday}
+                    hint={
+                      overview.status
+                        ? `${overview.status.kind === 'lesson' ? 'Сейчас' : 'Дальше'}: ${overview.subjectName(overview.status.lesson.subjectId)}`
+                        : undefined
+                    }
+                  />
                   <Stat className={styles.stat} label={`${coin.symbol} / USD`} value="—" />
                 </div>
 
@@ -154,7 +172,7 @@ export function DesktopShell({ route }: { route: Route }) {
           </div>
 
           <footer className={styles.footer}>
-            <span>{DEMO_NOTE}</span>
+            <span>{demoNote(overview.demo)}</span>
             <span>Данные хранятся только на этом устройстве</span>
           </footer>
         </main>

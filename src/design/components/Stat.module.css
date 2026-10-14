@@ -27,6 +27,9 @@
   font-weight: 700;
   font-size: var(--fs-average);
   line-height: 0.9;
+  /* The comma's tail hangs below the 0.9 line box. */
+  overflow: visible;
+  padding-bottom: 0.06em;
 }
 
 .text {
@@ -45,4 +48,10 @@
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--muted);
+}
+
+.sm {
+  font-size: 20px;
+  line-height: 1.15;
+  white-space: normal;
 }

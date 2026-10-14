@@ -6,6 +6,16 @@
 
 .summary {
   border: var(--rule) solid var(--line-strong);
+  container-type: inline-size;
+}
+
+/* Amounts with currency are long: scale with the block width so they never clip. */
+.balance > span:nth-child(2) {
+  font-size: min(var(--fs-number-lg), 11cqi);
+}
+
+.flow > span:nth-child(2) {
+  font-size: min(28px, 5.6cqi);
 }
 
 .balance {
@@ -100,4 +110,90 @@
   color: var(--accent);
   border-top: var(--rule-strong) solid var(--accent);
   margin-top: -1px;
+}
+
+/* List */
+
+.amountField input {
+  font-family: var(--font-mono);
+  font-size: 22px;
+}
+
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 11px 0;
+}
+
+.muted {
+  font-size: var(--fs-body-sm);
+  color: var(--muted);
+}
+
+.list {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 60px;
+  padding: 8px 4px;
+  border: 0;
+  border-bottom: var(--rule) solid var(--line);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.row:hover {
+  background: var(--panel);
+}
+
+.rowDate {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fs-body);
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.rowAmount {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.income {
+  color: var(--accent);
 }

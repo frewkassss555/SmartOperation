@@ -29,8 +29,55 @@
   outline-offset: 0;
 }
 
-.hint {
+.input[aria-invalid='true'] {
+  border-color: var(--negative);
+}
+
+/* Native date/time pickers: keep the dark scheme and a square look. */
+.input::-webkit-calendar-picker-indicator {
+  filter: invert(0.85);
+  cursor: pointer;
+}
+
+.selectWrap {
+  position: relative;
+  display: block;
+}
+
+.select {
+  appearance: none;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.select option {
+  background: var(--ground);
+  color: var(--text);
+}
+
+.chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  margin-top: -4px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.textarea {
+  min-height: 180px;
+  padding: 10px 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.hint,
+.error {
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--muted);
+}
+
+.error {
+  color: var(--negative);
 }

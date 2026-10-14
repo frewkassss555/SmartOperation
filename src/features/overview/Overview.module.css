@@ -1,0 +1,82 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* 2×2 grid of indicators joined like table cells. */
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 1px 0 0 1px;
+}
+
+.cell {
+  min-width: 0;
+  margin: -1px 0 0 -1px;
+  padding: 16px;
+  border: var(--rule) solid var(--line-strong);
+  transition: background-color var(--dur) var(--ease);
+}
+
+.cell:hover {
+  background: var(--panel);
+}
+
+.cell:focus-visible {
+  position: relative;
+  outline-offset: -2px;
+}
+
+.heading {
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.muted {
+  font-size: var(--fs-body-sm);
+  color: var(--muted);
+}
+
+.lessons {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+.lesson {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: var(--rule) solid var(--line);
+}
+
+.time {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.current .time,
+.countdown {
+  color: var(--accent);
+}
+
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+}

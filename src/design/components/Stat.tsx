@@ -1,11 +1,11 @@
-﻿import type { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styles from './Stat.module.css';
 
 type StatProps = {
   label: string;
   value: ReactNode;
-  /** md 32px, lg 48px mono; average is the 96px Oswald figure used for grade averages. */
-  size?: 'md' | 'lg' | 'average';
+  /** sm 20px, md 32px, lg 48px mono; average is the 96px Oswald figure used for grade averages. */
+  size?: 'sm' | 'md' | 'lg' | 'average';
   tone?: 'text' | 'accent' | 'negative';
   hint?: ReactNode;
   className?: string | undefined;

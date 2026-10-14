@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { formatHeaderDate, toIsoDate } from '../lib/date';
+import { formatHeaderDate, overviewTitle, toIsoDate } from '../lib/date';
 import { Brand } from './Brand';
 import { useToday } from './hooks';
 import { routeHref, SECTIONS, type Route } from './routes';
@@ -11,7 +11,7 @@ export function PhoneShell({ route }: { route: Route }) {
   const mainRef = useRef<HTMLElement>(null);
   const View = SECTION_VIEWS[route];
   const section = SECTIONS.find((s) => s.id === route);
-  const title = section?.title ?? 'Настройки';
+  const dayTitle = overviewTitle(today);
 
   // Each screen starts at the top.
   useEffect(() => {
@@ -21,16 +21,19 @@ export function PhoneShell({ route }: { route: Route }) {
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
-        <Brand />
+        <a
+          href={routeHref('overview')}
+          className={styles.brandLink}
+          aria-current={route === 'overview' ? 'page' : undefined}
+          aria-label="Трекер, обзор"
+        >
+          <Brand />
+        </a>
         <div className={styles.headerRight}>
           <time className={styles.date} dateTime={toIsoDate(today)}>
             {formatHeaderDate(today)}
           </time>
-          <a
-            href={routeHref('settings')}
-            className={styles.settings}
-            aria-current={route === 'settings' ? 'page' : undefined}
-          >
+          <a href={routeHref('settings')} className={styles.settings} aria-current={route === 'settings' ? 'page' : undefined}>
             Настр.
           </a>
         </div>
@@ -38,7 +41,17 @@ export function PhoneShell({ route }: { route: Route }) {
 
       <main className={styles.main} ref={mainRef}>
         <div className={styles.screenHead}>
-          <h1 className={styles.title}>{title}</h1>
+          <h1 className={styles.title}>
+            {route === 'overview' ? (
+              <>
+                {dayTitle.weekday}
+                <span className={styles.dot}>.</span>
+                {dayTitle.day}
+              </>
+            ) : (
+              (section?.title ?? 'Настройки')
+            )}
+          </h1>
           {section && (
             <span className={styles.counter}>
               {section.index} / {String(SECTIONS.length).padStart(2, '0')}

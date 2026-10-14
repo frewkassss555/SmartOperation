@@ -1,4 +1,4 @@
-﻿import { useId, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import styles from './Panel.module.css';
 
 type PanelProps = {

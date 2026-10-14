@@ -11,6 +11,7 @@
   --accent: #D7FF3D;       /* the only accent; text on it uses --ground */
   --negative: #FF6A45;
   --radius: 0;
+  --scrim: rgb(16 17 16 / 0.86); /* --ground at 86%, behind dialogs */
 
   /* Lines */
   --rule: 1px;

@@ -1,5 +1,6 @@
 export type SectionId = 'grades' | 'finance' | 'schedule' | 'notes' | 'market';
-export type Route = SectionId | 'settings';
+/** 'overview' is the phone's summary screen; on the desktop the overview is always shown. */
+export type Route = SectionId | 'settings' | 'overview';
 
 export type Section = {
   id: SectionId;
@@ -20,7 +21,7 @@ export const SECTIONS: readonly Section[] = [
 
 export const DEFAULT_ROUTE: Route = 'grades';
 
-const ROUTES: readonly Route[] = [...SECTIONS.map((s) => s.id), 'settings'];
+const ROUTES: readonly Route[] = [...SECTIONS.map((s) => s.id), 'settings', 'overview'];
 
 export function parseHash(hash: string): Route | null {
   const path = hash.replace(/^#\/?/, '').split(/[/?]/)[0] ?? '';

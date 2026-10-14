@@ -1,95 +1,182 @@
-import { useUi, type FinanceRange } from '../../app/uiStore';
+import { useState } from 'react';
 import { useToday } from '../../app/hooks';
-import { Button, EmptyState, Segmented, Stat } from '../../design';
-import { daysInMonth, mondayIndex, WEEK_DAYS } from '../../lib/date';
-import { NOT_READY, type SectionProps } from '../types';
-import styles from './FinanceSection.module.css';
+import { useUi, type FinanceRange, type ListPeriod } from '../../app/uiStore';
+import { Button, Chip, EmptyState, Segmented, Stat } from '../../design';
+import { useSettings } from '../../db/settings';
+import type { Txn } from '../../db/types';
+import { formatDayMonth, toIsoDate, WEEK_DAYS } from '../../lib/date';
+import { balance, expensesByDay, formatMoney, formatMoneyShort, totals } from '../../lib/money';
+import type { SectionProps } from '../types';
+import { rangeDates, useTxns } from './data';
+import styles from './Finance.module.css';
+import { TxnDialog } from './TxnDialog';
 
 const RANGES = [
   { value: 'week', label: 'Неделя' },
   { value: 'month', label: 'Месяц' },
 ] as const satisfies readonly { value: FinanceRange; label: string }[];
 
-/** Max bar height in px; real values scale into it once transactions exist. */
+const LIST_PERIODS = [
+  { value: 'week', label: 'Неделя' },
+  { value: 'month', label: 'Месяц' },
+  { value: 'all', label: 'Всё' },
+] as const satisfies readonly { value: ListPeriod; label: string }[];
+
+/** Max bar height in px. */
 const BAR_MAX = 80;
 
-type Column = { key: string; label: string; value: number; today: boolean; showLabel: boolean };
+/** Rows shown in the desktop panel before "show all", so the panel row stays compact. */
+const PANEL_ROWS = 8;
 
-function columns(range: FinanceRange, today: Date): Column[] {
-  if (range === 'week') {
-    const todayIndex = mondayIndex(today);
-    return WEEK_DAYS.map((label, i) => ({ key: label, label, value: 0, today: i === todayIndex, showLabel: true }));
-  }
-  return Array.from({ length: daysInMonth(today) }, (_, i) => {
-    const day = i + 1;
-    return {
-      key: String(day),
-      label: String(day),
-      value: 0,
-      today: day === today.getDate(),
-      showLabel: day === 1 || day % 5 === 0,
-    };
-  });
-}
-
-export function FinanceSection(_: SectionProps) {
+export function FinanceSection({ compact }: SectionProps) {
+  const today = useToday();
+  const todayIso = toIsoDate(today);
+  const txns = useTxns();
+  const settings = useSettings();
   const range = useUi((s) => s.financeRange);
   const setRange = useUi((s) => s.setFinanceRange);
-  const today = useToday();
-  const cols = columns(range, today);
-  const max = Math.max(1, ...cols.map((c) => c.value));
+  const listPeriod = useUi((s) => s.financeListPeriod);
+  const setListPeriod = useUi((s) => s.setFinanceListPeriod);
+  const [category, setCategory] = useState<string | null>(null);
+  const [editor, setEditor] = useState<{ txn?: Txn | undefined } | null>(null);
+  const [showAll, setShowAll] = useState(false);
+
+  const all = txns ?? [];
+  const dates = rangeDates(range, today);
+  const inRange = all.filter((t) => t.date >= dates[0]! && t.date <= dates.at(-1)!);
+  const { income, expense } = totals(inRange);
+  const bars = expensesByDay(all, dates);
+  const max = Math.max(1, ...bars);
+
+  const listDates = listPeriod === 'all' ? null : rangeDates(listPeriod, today);
+  const list = all.filter(
+    (t) =>
+      (category === null || t.category === category) &&
+      (listDates === null || (t.date >= listDates[0]! && t.date <= listDates.at(-1)!)),
+  );
+  const limited = !compact && !showAll && list.length > PANEL_ROWS;
+  const shown = limited ? list.slice(0, PANEL_ROWS) : list;
+  const usedCategories = settings.categories.filter((c) => all.some((t) => t.category === c));
+  const money = (minor: number) => formatMoney(minor, settings.currency);
+  const rangeWord = range === 'week' ? 'за неделю' : 'за месяц';
 
   return (
     <div className={styles.section}>
       <div className={styles.summary}>
-        <Stat className={styles.balance} label="Баланс" value="0,00" size="lg" tone="accent" />
+        <Stat className={styles.balance} label="Баланс" value={money(balance(settings.startBalance, all))} size="lg" tone="accent" />
         <div className={styles.flows}>
-          <Stat className={styles.flow} label="Доход" value="+0,00" tone="accent" />
-          <Stat className={styles.flow} label="Расход" value="−0,00" />
+          <Stat className={styles.flow} label={`Доход ${rangeWord}`} value={`+${money(income)}`} tone="accent" />
+          <Stat className={styles.flow} label={`Расход ${rangeWord}`} value={`−${money(expense)}`} />
         </div>
       </div>
 
       <div className={styles.chartHead}>
         <span className="label">Расходы по дням</span>
-        <Segmented label="Период расходов" options={RANGES} value={range} onChange={setRange} />
+        <Segmented label="Период графика расходов" options={RANGES} value={range} onChange={setRange} />
       </div>
 
       <div
         className={styles.chart}
         data-range={range}
         role="img"
-        aria-label={range === 'week' ? 'Расходы за неделю: нет данных' : 'Расходы за месяц: нет данных'}
+        aria-label={`Расходы ${rangeWord}: ${bars.map((v, i) => `${range === 'week' ? WEEK_DAYS[i] : i + 1} ${formatMoneyShort(v)}`).join(', ')}`}
       >
         <div className={styles.bars}>
-          {cols.map((col) => (
-            <div key={col.key} className={styles.col}>
-              {range === 'week' && <span className={styles.amount}>{col.value}</span>}
+          {dates.map((d, i) => (
+            <div key={d} className={styles.col}>
+              {range === 'week' && <span className={styles.amount}>{bars[i] ? formatMoneyShort(bars[i]!) : ''}</span>}
               <span
-                className={col.today ? `${styles.bar} ${styles.today}` : styles.bar}
-                style={{ height: `${Math.round((col.value / max) * BAR_MAX)}px` }}
+                className={d === todayIso ? `${styles.bar} ${styles.today}` : styles.bar}
+                style={{ height: `${Math.round(((bars[i] ?? 0) / max) * BAR_MAX)}px` }}
               />
             </div>
           ))}
         </div>
         <div className={styles.axis}>
-          {cols.map((col) => (
-            <span key={col.key} className={col.today ? `${styles.day} ${styles.dayToday}` : styles.day}>
-              {col.showLabel ? col.label : ''}
-            </span>
-          ))}
+          {dates.map((d, i) => {
+            const day = i + 1;
+            const label = range === 'week' ? WEEK_DAYS[i] : day === 1 || day % 5 === 0 ? String(day) : '';
+            return (
+              <span key={d} className={d === todayIso ? `${styles.day} ${styles.dayToday}` : styles.day}>
+                {label}
+              </span>
+            );
+          })}
         </div>
       </div>
 
-      <EmptyState
-        title="Операций пока нет"
-        action={
-          <Button variant="primary" disabled title={NOT_READY}>
+      {txns !== undefined && all.length === 0 ? (
+        <EmptyState
+          title="Операций пока нет"
+          action={
+            <Button variant="primary" onClick={() => setEditor({})}>
+              Добавить операцию +
+            </Button>
+          }
+        >
+          Запишите доход или расход, и баланс со столбиками пересчитаются сами.
+        </EmptyState>
+      ) : (
+        <>
+          <Button variant="primary" block={compact} onClick={() => setEditor({})}>
             Добавить операцию +
           </Button>
-        }
-      >
-        Запишите доход или расход, и баланс со столбиками пересчитаются сами.
-      </EmptyState>
+
+          <div className={styles.filters}>
+            <Segmented label="Период списка" options={LIST_PERIODS} value={listPeriod} onChange={setListPeriod} />
+            {usedCategories.length > 0 && (
+              <div className={styles.chips} role="group" aria-label="Категория">
+                <Chip pressed={category === null} onClick={() => setCategory(null)}>
+                  Все
+                </Chip>
+                {usedCategories.map((c) => (
+                  <Chip key={c} pressed={category === c} onClick={() => setCategory(category === c ? null : c)}>
+                    {c}
+                  </Chip>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {list.length === 0 ? (
+            <p className={styles.muted}>Нет операций для этого фильтра.</p>
+          ) : (
+            <ul className={`${styles.list} appear`} aria-label="Операции">
+              {shown.map((t) => (
+                <li key={t.id}>
+                  <button type="button" className={styles.row} onClick={() => setEditor({ txn: t })}>
+                    <span className={styles.rowDate}>{formatDayMonth(t.date)}</span>
+                    <span className={styles.rowMain}>
+                      <span className={styles.rowTitle}>{t.note || t.category}</span>
+                      <span className={styles.rowMeta}>
+                        <Chip>{t.category}</Chip>
+                        {t.repeat && <Chip>{t.repeat === 'week' ? 'Каждую неделю' : 'Каждый месяц'}</Chip>}
+                      </span>
+                    </span>
+                    <span className={t.kind === 'in' ? `${styles.rowAmount} ${styles.income}` : styles.rowAmount}>
+                      {t.kind === 'in' ? '+' : '−'}
+                      {money(t.amount)}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {!compact && list.length > PANEL_ROWS && (
+            <Button variant="ghost" onClick={() => setShowAll(!showAll)}>
+              {showAll ? 'Свернуть' : `Показать все · ${list.length}`}
+            </Button>
+          )}
+        </>
+      )}
+
+      <TxnDialog
+        open={editor !== null}
+        onClose={() => setEditor(null)}
+        txn={editor?.txn}
+        categories={settings.categories}
+        currency={settings.currency}
+      />
     </div>
   );
 }

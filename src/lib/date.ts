@@ -14,6 +14,26 @@ export function toIsoDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/** 'YYYY-MM-DD' → local Date at midnight. */
+export function parseIsoDate(iso: string): Date {
+  const [y = 1970, m = 1, d = 1] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/** "14.10" from an ISO date. */
+export function formatDayMonth(iso: string): string {
+  const [, m = '', d = ''] = iso.split('-');
+  return `${d}.${m}`;
+}
+
+/** Adds months keeping the anchor day, clamped to the month length (31 Jan + 1 → 28/29 Feb). */
+export function addMonthsClamped(date: Date, months: number, anchorDay = date.getDate()): Date {
+  const target = new Date(date.getFullYear(), date.getMonth() + months, 1);
+  const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  target.setDate(Math.min(anchorDay, last));
+  return target;
+}
+
 export function addDays(date: Date, days: number): Date {
   const next = new Date(date);
   next.setDate(next.getDate() + days);

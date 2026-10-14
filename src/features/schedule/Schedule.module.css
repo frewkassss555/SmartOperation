@@ -1,0 +1,205 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Six day cells joined like table cells. */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  padding-left: 1px;
+}
+
+.day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  margin-left: -1px;
+  padding: 8px 0;
+  border: var(--rule) solid var(--line-strong);
+  background: transparent;
+  color: var(--text);
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+.day:hover {
+  background: var(--panel);
+}
+
+.dayName {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.dayNum {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.todayMark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+}
+
+.selected,
+.selected:hover {
+  z-index: 1;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}
+
+.selected .dayName {
+  color: var(--ground);
+}
+
+.selected .todayMark {
+  background: var(--ground);
+}
+
+.parity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+/* Lessons */
+
+.lessons {
+  border-top: var(--rule) solid var(--line-strong);
+}
+
+.lesson {
+  display: grid;
+  grid-template-columns: 28px 64px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  min-height: 64px;
+  padding: 14px 4px;
+  border: 0;
+  border-bottom: var(--rule) solid var(--line);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.lesson:hover {
+  background: var(--panel);
+}
+
+.index {
+  display: grid;
+  place-items: center;
+  height: 24px;
+  margin-top: 1px;
+  border: var(--rule) solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+}
+
+/* The current lesson (or the next one during a break) gets a lime index. */
+.current .index {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--ground);
+}
+
+.time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.timeEnd {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.lessonMain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.subject {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.lessonNote {
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}
+
+.room {
+  padding: 2px 8px;
+  border: var(--rule) solid var(--line-strong);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.copyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.muted {
+  font-size: var(--fs-body-sm);
+  color: var(--text-soft);
+}
+
+.error {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--negative);
+}

@@ -20,5 +20,7 @@ export default defineConfig({
   },
   test: {
     include: ['src/**/*.test.ts'],
+    // Stable dates in tests that touch "today".
+    env: { TZ: 'Europe/Minsk' },
   },
 });

@@ -1,0 +1,86 @@
+.dialog {
+  width: 100%;
+  max-width: 100%;
+  max-height: 92dvh;
+  margin: auto auto 0;
+  padding: 0;
+  border: 0;
+  border-top: var(--rule-strong) solid var(--text);
+  background: var(--ground);
+  color: var(--text);
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+.dialog[open] {
+  animation: appear var(--dur) var(--ease) both;
+}
+
+@media (min-width: 900px) {
+  .dialog {
+    width: 520px;
+    margin: auto;
+    border: var(--rule-strong) solid var(--text);
+  }
+}
+
+.frame {
+  display: flex;
+  flex-direction: column;
+  max-height: inherit;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px var(--gutter) 16px;
+  border-bottom: var(--rule) solid var(--line);
+}
+
+.title {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: var(--tap);
+  height: var(--tap);
+  margin: -8px -10px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  transition: color var(--dur) var(--ease);
+}
+
+.close:hover {
+  color: var(--text);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px var(--gutter);
+  overflow-y: auto;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px var(--gutter) calc(16px + env(safe-area-inset-bottom));
+  border-top: var(--rule) solid var(--line);
+}

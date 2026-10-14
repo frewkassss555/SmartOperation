@@ -1,8 +1,8 @@
 # Tracker
 
-An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device. The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
+An offline-first PWA for students: grades, finances, schedule, notes and crypto quotes in one app. All data stays on the device in IndexedDB. The full spec (in Russian) is in [PROMPT.md](PROMPT.md); non-obvious decisions are logged in [DECISIONS.md](DECISIONS.md).
 
-**Status:** stage 1 of 5 (scaffold and design system). The five sections are empty stubs.
+**Status:** stage 2 of 5. Grades, finances, schedule, notes, overview and settings work on local data. Market quotes and offline install come in stage 3.
 
 ## Requirements
 
@@ -12,27 +12,38 @@ Node.js 20 or newer.
 
 ```sh
 npm install
-npm run dev          # dev server at http://localhost:5173
+npm run dev          # dev server at http://127.0.0.1:5173 (opens the browser)
 npm run typecheck    # TypeScript, strict
-npm test             # Vitest unit tests
+npm test             # Vitest: calculations, export/import round-trip
 npm run build        # type check + production build into dist/
 npm run preview      # serve dist/
 npm run screenshots  # after build: 390×844 and 1440×900 screenshots into screenshots/
+npm run smoke        # after build: Playwright walk-through of add/edit/delete/undo
 ```
 
-`npm run screenshots` needs Playwright's Chromium once: `npx playwright install chromium`.
+`screenshots` and `smoke` need Playwright's Chromium once: `npx playwright install chromium`.
+
+On Windows PowerShell with script execution disabled, use `npm.cmd` instead of `npm`.
 
 ## Structure
 
 ```
 src/
-  app/        shell, navigation, hash router, UI state (Zustand)
-  design/     tokens.css, base.css, fonts, components: Panel, Stat, Chip, Segmented, Button, Field, Bar, EmptyState
-  features/   one folder per section: grades, finance, schedule, notes, market, settings
-  lib/        pure helpers (dates) with tests
+  app/        shell, navigation, hash router, UI state (Zustand), undo bar
+  design/     tokens.css, base.css, fonts, components (Panel, Stat, Chip, Segmented, Button,
+              Field, Bar, EmptyState, Dialog, LineChart)
+  db/         Dexie schema, settings, export/import, demo data, recurring transactions
+  features/   grades, finance, schedule, notes, market, overview, settings
+  lib/        pure calculations with tests: dates, money, grades, recurring, schedule, notes
 public/       static assets
-scripts/      screenshot check
+scripts/      screenshot and smoke checks
 ```
+
+## Data
+
+- Money is stored as integer minor units (kopecks); dates as `YYYY-MM-DD` strings.
+- The Dexie schema is versioned (`SCHEMA_VERSION` in `src/db/db.ts`); add a new `version(n)` block for migrations.
+- Export is one JSON file with all tables and a `version` field. Import validates it and offers replace or merge.
 
 ## Design rules
 
